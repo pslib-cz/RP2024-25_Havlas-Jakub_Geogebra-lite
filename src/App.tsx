@@ -29,7 +29,7 @@ function App() {
         <Sinusoid expression={rovnice} />
         <Cosinusoid expression={rovnice} />
         <Tangensoid expression={rovnice} />
-        <CoTangensoid expression={rovnice} />
+       
         <g stroke-width="0.1" stroke="lightgray">
           <line x1="-10" y1="-15" x2="-10" y2="15" />
           <line x1="-5" y1="-15" x2="-5" y2="15" />
@@ -200,7 +200,11 @@ let Tangensoid = ({ expression }: { expression: string }) => {
   let a = 1;
   let b = 1;
   let c = 0;
+  let pathArray = [];
   let path;
+ 
+  let lastY = -Infinity;
+  let j = 0;
   for (let i = -15; i < 15; i = i + 1 / 33) {
     let x = i;
     let y = a * Math.tan(b * x) + c;
@@ -209,9 +213,25 @@ let Tangensoid = ({ expression }: { expression: string }) => {
     } else {
       path = path + `L ${x} ${-y} `;
     }
+    console.log(lastY, y);
+    if (lastY > y) {
+      pathArray.push(path);
+      path = `M ${x} ${-y} `;
+      lastY = -Infinity;
+      j++;
+    }else {
+      lastY = y;
+    }
+   
   }
-
-  return <path d={path} fill="none" stroke="black" stroke-width="0.1" />;
+  console.log(pathArray);
+  return (
+    <>
+      {pathArray.map((d, index) => (
+        <path key={index} d={d} stroke="black" fill="none" strokeWidth={0.1}/>
+      ))}
+    </>
+  );
 };
 
 let CoTangensoid = ({ expression }: { expression: string }) => {
@@ -220,6 +240,7 @@ let CoTangensoid = ({ expression }: { expression: string }) => {
   let b = 1;
   let c = 0;
   let path;
+  
   for (let i = -15; i < 15; i = i + 1 / 33) {
     let x = i;
     let y = a * (1 / Math.tan(b * x)) + c;
