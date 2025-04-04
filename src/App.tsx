@@ -29,7 +29,9 @@ function App() {
         <Sinusoid expression={rovnice} />
         <Cosinusoid expression={rovnice} />
         <Tangensoid expression={rovnice} />
-       
+        <CoTangensoid expression={rovnice} />
+        <Exponential expression={rovnice} />
+        <Logarythmic expression={rovnice} />
         <g stroke-width="0.1" stroke="lightgray">
           <line x1="-10" y1="-15" x2="-10" y2="15" />
           <line x1="-5" y1="-15" x2="-5" y2="15" />
@@ -200,51 +202,88 @@ let Tangensoid = ({ expression }: { expression: string }) => {
   let a = 1;
   let b = 1;
   let c = 0;
-  let pathArray = [];
+  let pathArray: string[] = [];
   let path;
- 
+  let lock = true;
   let lastY = -Infinity;
   let j = 0;
   for (let i = -15; i < 15; i = i + 1 / 33) {
     let x = i;
     let y = a * Math.tan(b * x) + c;
-    if (i === -15) {
-      path = `M ${x} ${-y} `;
-    } else {
-      path = path + `L ${x} ${-y} `;
-    }
-    console.log(lastY, y);
+
     if (lastY > y) {
-      pathArray.push(path);
-      path = `M ${x} ${-y} `;
       lastY = -Infinity;
       j++;
-    }else {
+      lock = true;
+      continue;
+    } else {
       lastY = y;
     }
-   
+    if (lock) {
+      pathArray[j] = `M ${x} ${-y} `;
+      lock = false;
+    } else {
+      pathArray[j] = pathArray[j] + `L ${x} ${-y} `;
+    }
   }
-  console.log(pathArray);
+
   return (
     <>
       {pathArray.map((d, index) => (
-        <path key={index} d={d} stroke="black" fill="none" strokeWidth={0.1}/>
+        <path key={index} d={d} stroke="black" fill="none" strokeWidth={0.1} />
       ))}
     </>
   );
 };
-
 let CoTangensoid = ({ expression }: { expression: string }) => {
   // y = a * sin(b * x + c) + d
   let a = 1;
   let b = 1;
   let c = 0;
-  let path;
-  
+  let pathArray: string[] = [];
+
+  let lock = true;
+  let lastY = Infinity;
+  let j = 0;
   for (let i = -15; i < 15; i = i + 1 / 33) {
     let x = i;
     let y = a * (1 / Math.tan(b * x)) + c;
-    y = 1 / y;
+
+    if (lastY < y) {
+      lastY = Infinity;
+      j++;
+      lock = true;
+      continue;
+    } else {
+      lastY = y;
+    }
+    if (lock) {
+      pathArray[j] = `M ${x} ${-y} `;
+      lock = false;
+    } else {
+      pathArray[j] = pathArray[j] + `L ${x} ${-y} `;
+    }
+  }
+
+  return (
+    <>
+      {pathArray.map((d, index) => (
+        <path key={index} d={d} stroke="orange" fill="none" strokeWidth={0.1} />
+      ))}
+    </>
+  );
+};
+
+let Exponential = ({ expression }: { expression: string }) => {
+  let a = 1;
+  let b = 1;
+  let c = 0;
+  let path;
+  for (let i = -15; i < 15; i = i + 1 / 33) {
+    let x = i;
+
+    let y = a * Math.exp(b * x) + c;
+
     if (i === -15) {
       path = `M ${x} ${-y} `;
     } else {
@@ -252,5 +291,26 @@ let CoTangensoid = ({ expression }: { expression: string }) => {
     }
   }
 
-  return <path d={path} fill="none" stroke="brown" stroke-width="0.1" />;
+  return <path d={path} fill="none" stroke="purple" stroke-width="0.1" />;
+};
+
+let Logarythmic = ({ expression }: { expression: string }) => {
+  let a = 2;
+  let b = 3;
+  let c = 5;
+  let path;
+  for (let i = 0 + 1 / 33; i < 15; i = i + 1 / 33) {
+    let x = i;
+    let ans = Math.log10(x * b);
+    console.log(ans);
+    let y = a * Math.log10(b * x) + c;
+
+    if (i === 0 + 1 / 33) {
+      path = `M ${x} ${-y} `;
+    } else {
+      path = path + `L ${x} ${-y} `;
+    }
+  }
+
+  return <path d={path} fill="none" stroke="beige" stroke-width="0.1" />;
 };
