@@ -23,15 +23,8 @@ function App() {
           <line x1="-15" y1="0" x2="15" y2="0" stroke="black" />
           <line y1="-15" y2="15" x1="0" x2="0" stroke="black" />
         </g>
-        <LineLinear expression={rovnice2} />
-        <ParaBole expression={rovnice} />
-        <LinearPolygonal expression={rovnice} />
-        <Sinusoid expression={rovnice} />
-        <Cosinusoid expression={rovnice} />
-        <Tangensoid expression={rovnice} />
-        <CoTangensoid expression={rovnice} />
-        <Exponential expression={rovnice} />
-        <Logarythmic expression={rovnice} />
+        {general({ expression: rovnice })}
+        <Polynomial expression={rovnice} />
         <g stroke-width="0.1" stroke="lightgray">
           <line x1="-10" y1="-15" x2="-10" y2="15" />
           <line x1="-5" y1="-15" x2="-5" y2="15" />
@@ -164,10 +157,11 @@ let Sinusoid = ({ expression }: { expression: string }) => {
   let a = 1;
   let b = 1;
   let c = 0;
+  let d = 0;
   let path;
   for (let i = -15; i < 15; i = i + 1 / 33) {
     let x = i;
-    let y = a * Math.sin(b * x + c);
+    let y = a * Math.sin(b * x + c) + d;
     if (i === -15) {
       path = `M ${x} ${-y} `;
     } else {
@@ -278,6 +272,7 @@ let Exponential = ({ expression }: { expression: string }) => {
   let a = 1;
   let b = 1;
   let c = 0;
+  
   let path;
   for (let i = -15; i < 15; i = i + 1 / 33) {
     let x = i;
@@ -297,14 +292,15 @@ let Exponential = ({ expression }: { expression: string }) => {
 let Logarythmic = ({ expression }: { expression: string }) => {
   let a = 2;
   let b = 3;
-  let c = 5;
+  let c = 2;
   let path;
   for (let i = 0 + 1 / 33; i < 15; i = i + 1 / 33) {
     let x = i;
     let ans = Math.log10(x * b);
+    
+    let y = a * ans + c;
     console.log(ans);
-    let y = a * Math.log10(b * x) + c;
-
+    console.log(x, y);
     if (i === 0 + 1 / 33) {
       path = `M ${x} ${-y} `;
     } else {
@@ -312,5 +308,117 @@ let Logarythmic = ({ expression }: { expression: string }) => {
     }
   }
 
-  return <path d={path} fill="none" stroke="beige" stroke-width="0.1" />;
+  return <path d={path} fill="none" stroke="crimson" stroke-width="0.1" />;
 };
+
+let Polynomial = ({ expression }: { expression: string }) => {
+  // y = ax^n + bx^(n-1) + cx^(n-2) + ... + d
+  let a = 2;
+  let b = 6;
+  let c = 4;
+  let n = 3;
+  let path;
+  for (let i = -15; i < 15; i = i + 1 / 33) {
+    let x = i;
+    let y = a * Math.pow(x, n) + b * Math.pow(x, n - 1) + c * Math.pow(x, n - 2);
+    if (i === -15) {
+      path = `M ${x} ${-y} `;
+    } else {
+      path = path + `L ${x} ${-y} `;
+    }
+  }
+
+  return <path d={path} fill="none" stroke="purple" stroke-width="0.1" />;
+}
+let general = ({ expression }: { expression: string }) => {
+  let expression2 = "y = 2*x + 5";
+  let str = expression2; // Define 'str' as the input expression
+  let result = str.split('').filter(char => char !== ' ');
+
+  const target = 'x';
+
+  const positions = result
+    .map((char, index) => char === target ? index : -1)
+    .filter(index => index !== -1);
+
+  evaluator(result, 2);
+
+  // Return a placeholder JSX element or null
+  return <></>;
+};
+
+let evaluator = (expression: string[], x: number) => {
+  let ans;
+  expression.forEach((item) => {
+    if (item == "x") {
+      
+      item = x.toString();
+    } 
+  });
+  
+  for (let i = expression.length - 1; i >= 0; i--) {
+    if (expression[i] === "^") {
+      const base = parseFloat(expression[i - 1]);
+      const exponent = parseFloat(expression[i + 1]);
+  
+      if (!isNaN(base) && !isNaN(exponent)) {
+        const result = Math.pow(base, exponent);
+        expression[i - 1] = result.toString();
+        expression.splice(i, 2); // remove '^' and right operand
+      } else {
+        throw new Error("Invalid base or exponent");
+      }
+    }
+  }
+
+  for (let i = 0; i < expression.length; i++) {
+    if (expression[i] === "*") {
+      let a = 
+        parseFloat(expression[i - 1])*parseFloat(expression[i + 1]);
+      expression[i - 1] = a.toString();  
+      expression.splice(i, 2);
+    }
+
+
+
+  }
+
+  for (let i = 0; i < expression.length; i++) {
+    if (expression[i] === "/") {
+      let a = 
+        parseFloat(expression[i - 1])/parseFloat(expression[i + 1]);
+      expression[i - 1] = a.toString();  
+      expression.splice(i, 2);
+    }
+
+
+
+  }
+
+  for (let i = 0; i < expression.length; i++) {
+    if (expression[i] === "+") {
+      let a =
+        parseFloat(expression[i - 1])+ parseFloat(expression[i + 1]);
+      expression[i - 1] = a.toString();  
+      expression.splice(i, 2);
+    }
+
+
+
+  }
+
+  for (let i = 0; i < expression.length; i++) {
+    if (expression[i] === "-") {
+      let a = 
+        parseFloat(expression[i - 1])-parseFloat(expression[i + 1]);
+      expression[i - 1] = a.toString();  
+      expression.splice(i, 2);
+    }
+
+
+
+  }
+  console.log(expression);
+  return expression[2];
+}
+
