@@ -8,3 +8,16 @@ if (bézierovi konzultaci){
 5, napsat aplikaci využívající knihovnu 2.5.
 6, nějakej ten design do 9.5.
 7, čas na opravu chyb do 16.5.
+
+
+y= ax +b
+y = ax^2 + bx + c
+y = (ax +b)/(cx + d)
+y = asin(bx + c) + d
+y = acos(bx + c) + d
+y = atan(bx + c) + d | x = k2pí => tanx = undefined
+y = acotan(bx + c) + d | x = k2pí => tanx = undefined
+y= a^(bx) + c 
+y = alog10(bx) + c | x > 0 && b > 0
+
+y = ax^n + bx^n(n-1)... + d
