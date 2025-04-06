@@ -24,7 +24,7 @@ function App() {
           <line y1="-15" y2="15" x1="0" x2="0" stroke="black" />
         </g>
         <General expression={rovnice} />
-        
+       
         <g stroke-width="0.1" stroke="lightgray">
           <line x1="-10" y1="-15" x2="-10" y2="15" />
           <line x1="-5" y1="-15" x2="-5" y2="15" />
@@ -116,10 +116,10 @@ let ParaBole = ({ expression }: { expression: string }) => {
 };
 let LinearPolygonal = ({ expression }: { expression: string }) => {
   // y = (ax + b) / (cx + d)
-  let a = 3;
-  let b = -2;
-  let c = -2;
-  let d = 5;
+  let a = 2;
+  let b = 3;
+  let c = 1;
+  let d = 1;
   let AsymptotaX = -d / c;
   let AsypmtotaY = a / c;
 
@@ -331,32 +331,88 @@ let Polynomial = ({ expression }: { expression: string }) => {
   return <path d={path} fill="none" stroke="purple" stroke-width="0.1" />;
 }
 let General = ({ expression }: { expression: string }) => {
-  let expression2 = "2*x^2 + 3x + 5";
+  let expression2 = "2*sin(x)"; // Example expression
   let str = expression2; // Define 'str' as the input expression
   let result = str.split('').filter(char => char !== ' ');
-  let path;
-  for (let i = -15; i < 15; i = i + 1 / 33) {
+  result = [ "2", "*", "sin", "(", "5" , "*", "x", ")" ];
+  let pathArray: string[] = [];
+  
+  let lock = true;
+  let lastY = 1000;
+  let j = 0;
+  for (let i = -15; i < 15; i = i + 1 /33) {
     let x = i;
     let y = parseFloat(evaluator(result, i));
-    if (i === -15) {
-      path = `M ${x} ${-y} `;
+    if (isNaN(y)) {
+      continue; // Skip if the result is NaN (e.g., division by zero)
+
+    }
+    console.log(lastY, y);
+    if (lastY < y) {
+      
+      lastY = 100;
+      j++;
+      lock = true;
+      continue;
     } else {
-      path = path + `L ${x} ${-y} `;
+      lastY = y;
+    }
+
+    if (lock) {
+      pathArray[j] = `M ${Math.round(x * 1000) /1000} ${Math.round(-y * 1000) /1000} `;
+      lock = false;
+    } else {
+      pathArray[j] = pathArray[j] + `L ${Math.round(x * 1000) /1000} ${Math.round(-y * 1000) /1000} `;
     }
   }
-    
-  
-
-  // Return a placeholder JSX element or null
-  return <path d={path} fill="none" stroke="purple" stroke-width="0.1" />;
+ 
+  return (
+    <>
+      {pathArray.map((d, index) => (
+        <path key={index} d={d} stroke="black" fill="none" strokeWidth={0.1} />
+      ))}
+    </>
+  );
 };
 
 let evaluator = (expression: string[], x: number) => {
   expression = expression.map(item => item === 'x' ? x.toString() : item.toString());
-// co chybí:
-// závorky
-// funkce jako sin, cos, tan, log, exp, sqrt
-// a násdobení jako: ax = a*x
+
+  for (let i = 0; i < expression.length; i++) {
+    if (expression[i] === "(") {
+      let openIndex = i;
+      let depth = 1;
+
+      for (let j = i + 1; j < expression.length; j++) {
+        if (expression[j] === "(") depth++;
+        if (expression[j] === ")") depth--;
+
+        if (depth === 0) {
+          const subExpr = expression.slice(openIndex + 1, j);
+          const result = evaluator(subExpr, x); // RECURSIVE!
+          expression.splice(openIndex, j - openIndex + 1, result); // replace ( ... ) with result
+          i = openIndex - 1; // rewind to recheck
+          break;
+        }
+      }
+    }
+  }
+  for (const { symbol, fn } of functions) {
+    for (let i = expression.length - 1; i >= 0; i--) {
+      if (expression[i] === symbol) {
+       
+        const right = parseFloat(expression[i + 1]);
+  
+        if ( !isNaN(right)) {
+          const result = fn( right);
+          expression[i - 1] = result.toString();
+          expression.splice(i, 2); // remove operator and right operand
+        } else {
+          throw new Error(`Invalid operands for '${symbol}'`);
+        }
+      }
+    }
+  }
   
   for (const { symbol, fn } of OPERATORS) {
     for (let i = expression.length - 1; i >= 0; i--) {
@@ -374,7 +430,7 @@ let evaluator = (expression: string[], x: number) => {
       }
     }
   }
-  console.log(expression);
+  
   return expression[0];
 }
 
@@ -384,10 +440,13 @@ const OPERATORS = [
   { symbol: '/', fn: (a: number, b: number) => a / b },
   { symbol: '+', fn: (a: number, b: number) => a + b },
   { symbol: '-', fn: (a: number, b: number) => a - b },
+
+];
+
+const functions = [
   { symbol: 'sin', fn: (a: number) => Math.sin(a) },
   { symbol: 'cos', fn: (a: number) => Math.cos(a) },
   { symbol: 'tan', fn: (a: number) => Math.tan(a) },
   { symbol: 'log', fn: (a: number) => Math.log10(a) },
-  { symbol: 'exp', fn: (a: number) => Math.exp(a) },
-  { symbol: 'sqrt', fn: (a: number) => Math.sqrt(a) },
-];
+ 
+  { symbol: 'sqrt', fn: (a: number) => Math.sqrt(a) }, ]
