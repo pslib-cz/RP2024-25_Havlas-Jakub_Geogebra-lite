@@ -21,8 +21,8 @@ function App() {
       svg.getScreenCTM()?.inverse()
     );
     setMousePosition({
-      x: transformedPoint.x.toFixed(2),
-      y: transformedPoint.y.toFixed(2),
+      x: parseFloat(transformedPoint.x.toFixed(2)),
+      y: parseFloat(transformedPoint.y.toFixed(2)),
     });
   };
 
@@ -359,16 +359,16 @@ let Polynomial = ({ expression }: { expression: string }) => {
   return <path d={path} fill="none" stroke="purple" stroke-width="0.1" />;
 };
 let General = ({ expression }: { expression: string }) => {
-  let expression2 = "(2x + 3)/(5*x + 1)"; // Example expression
+  let expression2 = "5*log(2*x) + 3"; // Example expression
   let str = expression2; // Define 'str' as the input expression
-  let result = str.split("").filter((char) => char !== " ");
+  let result = parseExpression(str); // Parse the expression
 
   let pathArray: string[] = [];
 
   let lock = true;
   let lastY = 1000;
   let j = 0;
-  for (let i = -15; i < 15; i = i + 1 / 33) {
+  for (let i = -15; i < 15; i = i + 1 / 100) {
     let x = i;
     let y = parseFloat(evaluator(result, i));
     if (isNaN(y)) {
@@ -380,7 +380,7 @@ let General = ({ expression }: { expression: string }) => {
     if (y < -20) {
       y = -16;
     }
-    console.log(x, y);
+   
     if (Math.abs(lastY) > 15 && Math.abs(y) > 15 && lastY * y < 0) {
       lastY = 100;
       j++;
@@ -411,6 +411,25 @@ let General = ({ expression }: { expression: string }) => {
   );
 };
 
+const parseExpression = (expression: string) => {
+  // Remove spaces
+  const cleanedExpr = expression.replace(/\s+/g, "");
+
+  // Regex to match function names, numbers, operators, and parentheses
+  const tokenRegex = /([a-zA-Z]+)|(\d*\.\d+|\d+)|([+\-*/^()])/g;
+  const rawTokens = cleanedExpr.match(tokenRegex) || [];
+
+  // Process tokens: numbers as float, functions/operators as strings
+  const parsedTokens = rawTokens.map(token => {
+    if (/^\d*\.?\d+$/.test(token)) {
+      return token;
+    }
+    return token;
+  });
+
+  return parsedTokens;
+};
+
 let evaluator = (expression: string[], x: number) => {
   expression = expression.map((item) =>
     item === "x" ? x.toString() : item.toString()
@@ -435,7 +454,7 @@ let evaluator = (expression: string[], x: number) => {
       }
     }
   }
-  /*
+ 
   for (const { symbol, fn } of functions) {
     for (let i = expression.length - 1; i >= 0; i--) {
       if (expression[i] === symbol) {
@@ -443,15 +462,18 @@ let evaluator = (expression: string[], x: number) => {
 
         if (!isNaN(right)) {
           const result = fn(right);
-          expression[i - 1] = result.toString();
-          expression.splice(i, 2); // remove operator and right operand
+          
+          expression[i] = result.toString();
+          
+          expression.splice(i + 1, 1); // remove operator and right operand
+          
         } else {
           throw new Error(`Invalid operands for '${symbol}'`);
         }
       }
     }
-  }*/
-
+  }
+  
   for (const { symbol, fn } of OPERATORS) {
     for (let i = expression.length - 1; i >= 0; i--) {
       if (expression[i] === symbol) {
@@ -462,13 +484,11 @@ let evaluator = (expression: string[], x: number) => {
           const result = fn(left, right);
           expression[i - 1] = result.toString();
           expression.splice(i, 2); // remove operator and right operand
-        } else {
-          throw new Error(`Invalid operands for '${symbol}'`);
-        }
+        } 
       }
     }
   }
-
+  
   return expression[0];
 };
 
@@ -488,3 +508,18 @@ const functions = [
 
   { symbol: "sqrt", fn: (a: number) => Math.sqrt(a) },
 ];
+const constants = [
+  { symbol: "pi", value: Math.PI },
+  { symbol: "e", value: Math.E },
+  { symbol: "phi", value: (1 + Math.sqrt(5)) / 2 },
+  { symbol: "tau", value: 2 * Math.PI },
+  { symbol: "gamma", value: 0.5772156649 },
+  { symbol: "catalan", value: 0.9159655941 },
+  { symbol: "apery", value: 1.2020569032 },
+  { symbol: "eulerMascheroni", value: 0.5772156649 },
+  { symbol: "goldenRatioConjugate", value: (Math.sqrt(5) - 1) / 2 },]
+
+  const brackets = [
+    { symbol: "(", fn: (a: number) => a },
+    { symbol: "|", fn: (a: number) => Math.abs(a) },
+  ]
