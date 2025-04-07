@@ -5,9 +5,26 @@ import "./App.css";
 
 function App() {
   const [count, setCount] = useState(0);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   let rovnice = "y = ax + b";
   let rovnice2 = "y = 1x + 5";
+
+  const handleMouseMove = (
+    event: React.MouseEvent<SVGSVGElement, MouseEvent>
+  ) => {
+    const svg = event.currentTarget;
+    const point = svg.createSVGPoint();
+    point.x = event.clientX;
+    point.y = event.clientY;
+    const transformedPoint = point.matrixTransform(
+      svg.getScreenCTM()?.inverse()
+    );
+    setMousePosition({
+      x: transformedPoint.x.toFixed(2),
+      y: transformedPoint.y.toFixed(2),
+    });
+  };
 
   return (
     <>
@@ -16,6 +33,7 @@ function App() {
         height="1000"
         viewBox="-15 -15 30 30"
         xmlns="http://www.w3.org/2000/svg"
+        onMouseMove={handleMouseMove}
       >
         <rect x="-15" y="-15" width="30" height="30" fill="white" />
 
@@ -24,7 +42,7 @@ function App() {
           <line y1="-15" y2="15" x1="0" x2="0" stroke="black" />
         </g>
         <General expression={rovnice} />
-       
+
         <g stroke-width="0.1" stroke="lightgray">
           <line x1="-10" y1="-15" x2="-10" y2="15" />
           <line x1="-5" y1="-15" x2="-5" y2="15" />
@@ -73,6 +91,15 @@ function App() {
             -10
           </text>
         </g>
+
+        <text
+          x={mousePosition.x}
+          y={mousePosition.y}
+          fontSize="0.5"
+          fill="black"
+        >
+          {`(${mousePosition.x}, ${mousePosition.y})`}
+        </text>
       </svg>
     </>
   );
@@ -272,7 +299,7 @@ let Exponential = ({ expression }: { expression: string }) => {
   let a = 1;
   let b = 1;
   let c = 0;
-  
+
   let path;
   for (let i = -15; i < 15; i = i + 1 / 33) {
     let x = i;
@@ -297,7 +324,7 @@ let Logarythmic = ({ expression }: { expression: string }) => {
   for (let i = 0 + 1 / 33; i < 15; i = i + 1 / 33) {
     let x = i;
     let ans = Math.log10(x * b);
-    
+
     let y = a * ans + c;
     console.log(ans);
     console.log(x, y);
@@ -320,7 +347,8 @@ let Polynomial = ({ expression }: { expression: string }) => {
   let path;
   for (let i = -15; i < 15; i = i + 1 / 33) {
     let x = i;
-    let y = a * Math.pow(x, n) + b * Math.pow(x, n - 1) + c * Math.pow(x, n - 2);
+    let y =
+      a * Math.pow(x, n) + b * Math.pow(x, n - 1) + c * Math.pow(x, n - 2);
     if (i === -15) {
       path = `M ${x} ${-y} `;
     } else {
@@ -329,27 +357,31 @@ let Polynomial = ({ expression }: { expression: string }) => {
   }
 
   return <path d={path} fill="none" stroke="purple" stroke-width="0.1" />;
-}
+};
 let General = ({ expression }: { expression: string }) => {
-  let expression2 = "2*sin(x)"; // Example expression
+  let expression2 = "(2x + 3)/(5*x + 1)"; // Example expression
   let str = expression2; // Define 'str' as the input expression
-  let result = str.split('').filter(char => char !== ' ');
-  result = [ "2", "*", "sin", "(", "5" , "*", "x", ")" ];
+  let result = str.split("").filter((char) => char !== " ");
+
   let pathArray: string[] = [];
-  
+
   let lock = true;
   let lastY = 1000;
   let j = 0;
-  for (let i = -15; i < 15; i = i + 1 /33) {
+  for (let i = -15; i < 15; i = i + 1 / 33) {
     let x = i;
     let y = parseFloat(evaluator(result, i));
     if (isNaN(y)) {
       continue; // Skip if the result is NaN (e.g., division by zero)
-
     }
-    console.log(lastY, y);
-    if (lastY < y) {
-      
+    if (y > 20) {
+      y = 16;
+    }
+    if (y < -20) {
+      y = -16;
+    }
+    console.log(x, y);
+    if (Math.abs(lastY) > 15 && Math.abs(y) > 15 && lastY * y < 0) {
       lastY = 100;
       j++;
       lock = true;
@@ -359,13 +391,17 @@ let General = ({ expression }: { expression: string }) => {
     }
 
     if (lock) {
-      pathArray[j] = `M ${Math.round(x * 1000) /1000} ${Math.round(-y * 1000) /1000} `;
+      pathArray[j] = `M ${Math.round(x * 1000) / 1000} ${
+        Math.round(-y * 1000) / 1000
+      } `;
       lock = false;
     } else {
-      pathArray[j] = pathArray[j] + `L ${Math.round(x * 1000) /1000} ${Math.round(-y * 1000) /1000} `;
+      pathArray[j] =
+        pathArray[j] +
+        `L ${Math.round(x * 1000) / 1000} ${Math.round(-y * 1000) / 1000} `;
     }
   }
- 
+
   return (
     <>
       {pathArray.map((d, index) => (
@@ -376,7 +412,9 @@ let General = ({ expression }: { expression: string }) => {
 };
 
 let evaluator = (expression: string[], x: number) => {
-  expression = expression.map(item => item === 'x' ? x.toString() : item.toString());
+  expression = expression.map((item) =>
+    item === "x" ? x.toString() : item.toString()
+  );
 
   for (let i = 0; i < expression.length; i++) {
     if (expression[i] === "(") {
@@ -397,14 +435,14 @@ let evaluator = (expression: string[], x: number) => {
       }
     }
   }
+  /*
   for (const { symbol, fn } of functions) {
     for (let i = expression.length - 1; i >= 0; i--) {
       if (expression[i] === symbol) {
-       
         const right = parseFloat(expression[i + 1]);
-  
-        if ( !isNaN(right)) {
-          const result = fn( right);
+
+        if (!isNaN(right)) {
+          const result = fn(right);
           expression[i - 1] = result.toString();
           expression.splice(i, 2); // remove operator and right operand
         } else {
@@ -412,14 +450,14 @@ let evaluator = (expression: string[], x: number) => {
         }
       }
     }
-  }
-  
+  }*/
+
   for (const { symbol, fn } of OPERATORS) {
     for (let i = expression.length - 1; i >= 0; i--) {
       if (expression[i] === symbol) {
         const left = parseFloat(expression[i - 1]);
         const right = parseFloat(expression[i + 1]);
-  
+
         if (!isNaN(left) && !isNaN(right)) {
           const result = fn(left, right);
           expression[i - 1] = result.toString();
@@ -430,23 +468,23 @@ let evaluator = (expression: string[], x: number) => {
       }
     }
   }
-  
+
   return expression[0];
-}
+};
 
 const OPERATORS = [
-  { symbol: '^', fn: (a: number, b: number) => Math.pow(a, b) },
-  { symbol: '*', fn: (a: number, b: number) => a * b },
-  { symbol: '/', fn: (a: number, b: number) => a / b },
-  { symbol: '+', fn: (a: number, b: number) => a + b },
-  { symbol: '-', fn: (a: number, b: number) => a - b },
-
+  { symbol: "^", fn: (a: number, b: number) => Math.pow(a, b) },
+  { symbol: "*", fn: (a: number, b: number) => a * b },
+  { symbol: "/", fn: (a: number, b: number) => a / b },
+  { symbol: "+", fn: (a: number, b: number) => a + b },
+  { symbol: "-", fn: (a: number, b: number) => a - b },
 ];
 
 const functions = [
-  { symbol: 'sin', fn: (a: number) => Math.sin(a) },
-  { symbol: 'cos', fn: (a: number) => Math.cos(a) },
-  { symbol: 'tan', fn: (a: number) => Math.tan(a) },
-  { symbol: 'log', fn: (a: number) => Math.log10(a) },
- 
-  { symbol: 'sqrt', fn: (a: number) => Math.sqrt(a) }, ]
+  { symbol: "sin", fn: (a: number) => Math.sin(a) },
+  { symbol: "cos", fn: (a: number) => Math.cos(a) },
+  { symbol: "tan", fn: (a: number) => Math.tan(a) },
+  { symbol: "log", fn: (a: number) => Math.log10(a) },
+
+  { symbol: "sqrt", fn: (a: number) => Math.sqrt(a) },
+];
