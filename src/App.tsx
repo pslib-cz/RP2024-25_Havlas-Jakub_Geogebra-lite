@@ -1,13 +1,55 @@
-import { useState, useRef } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
+import React, { useState, useCallback, useRef, useEffect } from "react";
+
 import "./App.css";
 
 function App() {
+  const [viewBox, setViewBox] = useState({
+    x: -15,
+    y: -15,
+    width: 30,
+    height: 30,
+  });
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  let rovnice = "(2*x + 1) / (x - 1)";
+  const handleWheel = (e: WheelEvent) => {
+    
+    e.preventDefault();
 
-  let rovnice = "|2*x + 1|";
+    const zoomFactor = e.deltaY > 0 ? 1.1 : 0.9;
+    
+    setViewBox((prev) => {
+      const centerX = prev.x + prev.width / 2;
+      const centerY = prev.y + prev.height / 2;
 
+      const newWidth = prev.width * zoomFactor;
+      const newHeight = prev.height * zoomFactor;
+
+      return {
+        width: newWidth,
+        height: newHeight,
+        x: centerX - newWidth / 2,
+        y: centerY - newHeight / 2,
+      };
+    });
+  };
+  useEffect(() => {
+   
+  }, [viewBox]);
+  useEffect(() => {
+    const svg = svgRef.current;
+   
   
+    if (!svg) return;
+  
+    svg.addEventListener('wheel', handleWheel, { passive: false });
+  
+    return () => {
+      svg.removeEventListener('wheel', handleWheel);
+    };
+  }, []);
+  
+  
+
   return (
     
     <>
@@ -19,12 +61,12 @@ function App() {
 
         >
           <svg
+          ref={svgRef}
         width="1000"
         height="1000"
-        viewBox="-15 -15 30 30"
-        
+        viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
         style={{ width: '100%', height: 'auto' ,
-
+        border: '1px solid black'
          
           
         }}
@@ -38,7 +80,7 @@ function App() {
           <line x1="-15" y1="0" x2="15" y2="0" stroke="black" />
           <line y1="-15" y2="15" x1="0" x2="0" stroke="black" />
         </g>
-        <General expression={rovnice} />
+        <General expression={rovnice} viewBox={viewBox} />
 
         <g stroke-width="0.1" stroke="lightgray">
           <line x1="-10" y1="-15" x2="-10" y2="15" />
@@ -107,7 +149,7 @@ function App() {
 export default App;
 
 
-let General = ({ expression }: { expression: string }) => {
+let General = ({ expression, viewBox }: { expression: string,viewBox: {x:number, y:number, width:number, height:number} }) => {
  
   let result = parseExpression(expression); // Parse the expression
 
@@ -116,20 +158,23 @@ let General = ({ expression }: { expression: string }) => {
   let lock = true;
   let lastY = 1000;
   let j = 0;
-  for (let i = -15; i < 15; i = i + 1 / 100) {
+  let step = 1000/viewBox.width
+ 
+  for (let i = viewBox.x; i < viewBox.width; i = i + 1/step) {
+    
     let x = i;
     let y = parseFloat(evaluator(result, i));
     if (isNaN(y)) {
       continue; // Skip if the result is NaN (e.g., division by zero)
     }
-    if (y > 20) {
-      y = 16;
+    if (y > -viewBox.y) {
+      y = -viewBox.y;
     }
-    if (y < -20) {
-      y = -16;
+    if (y < viewBox.y) {
+      y = viewBox.y;
     }
-   
-    if (Math.abs(lastY) > 15 && Math.abs(y) > 15 && lastY * y < 0) {
+   console.log(x, Math.abs(y), Math.abs(lastY), viewBox.y)
+    if (Math.abs(lastY) > viewBox.y && Math.abs(y) > -viewBox.y && lastY * y < 0) {
       lastY = 100;
       j++;
       lock = true;
@@ -214,7 +259,7 @@ let evaluator = (expression: string[], x: number) => {
             const subExpr = expression.slice(openIndex + 1, j);
             let result = evaluator(subExpr, x);
             
-            console.log(result)
+           
             expression.splice(openIndex, j - openIndex + 1, result); // replace ( ... ) with result
             i = openIndex - 1; // rewind to recheck
             break;
