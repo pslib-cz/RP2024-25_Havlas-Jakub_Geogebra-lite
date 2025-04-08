@@ -147,11 +147,45 @@ function App() {
 }
 
 export default App;
+let LibraryController = ({ expression, viewBox }: { expression: string,viewBox: {x:number, y:number, width:number, height:number} }) => {
+
+
+
+}
+
+type FunctionType = {
+  expression: string[];
+  pathArray: string[];
+};
 
 
 let General = ({ expression, viewBox }: { expression: string,viewBox: {x:number, y:number, width:number, height:number} }) => {
  
   let result = parseExpression(expression); // Parse the expression
+  const functionsFromStorage = JSON.parse(localStorage.getItem("functions") || "[]");
+  let isMatched = false;
+
+  for (let i = 0; i < functionsFromStorage.length; i++) {
+   
+    const functionType = functionsFromStorage[i]?.functionType;
+    
+    if (functionType && Array.isArray(functionType.expression)) {
+      const storedExpression = functionType.expression;
+      
+     
+      const isEqual = JSON.stringify(expression) === JSON.stringify(storedExpression);
+  
+        
+        if (isEqual) {
+          console.log(`Expression matches functionType at index ${i}`);
+          isMatched = true;
+          break; 
+        }
+      
+    }
+  }
+ 
+
 
   let pathArray: string[] = [];
 
@@ -167,14 +201,18 @@ let General = ({ expression, viewBox }: { expression: string,viewBox: {x:number,
     if (isNaN(y)) {
       continue; // Skip if the result is NaN (e.g., division by zero)
     }
+
+    if (Math.abs(lastY - y) < 0.1 ) {continue;}
+
+
     if (y > -viewBox.y) {
-      y = -viewBox.y;
+      y = -viewBox.y + 5;
     }
     if (y < viewBox.y) {
-      y = viewBox.y;
+      y = viewBox.y - 5;
     }
-   console.log(x, Math.abs(y), Math.abs(lastY), viewBox.y)
-    if (Math.abs(lastY) > viewBox.y && Math.abs(y) > -viewBox.y && lastY * y < 0) {
+   console.log(x, Math.abs(y), Math.abs(lastY), -viewBox.y)
+    if (Math.abs(lastY) > -viewBox.y && Math.abs(y) > -viewBox.y && lastY * y < 0) {
       lastY = 100;
       j++;
       lock = true;
@@ -194,7 +232,10 @@ let General = ({ expression, viewBox }: { expression: string,viewBox: {x:number,
         `L ${Math.round(x * 1000) / 1000} ${Math.round(-y * 1000) / 1000} `;
     }
   }
+  // merge paths 
 
+
+  localStorage.setItem("functions", JSON.stringify(pathArray));
   return (
     <>
       {pathArray.map((d, index) => (
@@ -339,3 +380,44 @@ const constants = [
   ]
 
  
+  // @ts-ignore
+  const mergeSort = <T,>(arr: T[]): T[] => {
+    // Base case: if the array has one or zero elements, it's already sorted
+    if (arr.length <= 1) {
+      return arr;
+    }
+  
+    // Step 1: Split the array into two halves
+    const mid = Math.floor(arr.length / 2);
+    const left = arr.slice(0, mid);
+    const right = arr.slice(mid);
+  
+    // Step 2: Recursively sort each half
+    const sortedLeft = mergeSort(left);
+    const sortedRight = mergeSort(right);
+  
+    // Step 3: Merge the two sorted halves
+    return merge(sortedLeft, sortedRight);
+  };
+  
+  // Merge function to combine two sorted arrays into one sorted array
+  // @ts-ignore: Disable JSX parsing for this line
+  const merge = <T,>(left: T[], right: T[]): T[] => {
+    let result: T[] = [];
+    let leftIndex = 0;
+    let rightIndex = 0;
+  
+    // Merge the two arrays while there are elements in both
+    while (leftIndex < left.length && rightIndex < right.length) {
+      if (left[leftIndex] < right[rightIndex]) {
+        result.push(left[leftIndex]);
+        leftIndex++;
+      } else {
+        result.push(right[rightIndex]);
+        rightIndex++;
+      }
+    }
+  
+    // If there are remaining elements in either array, add them to the result
+    return result.concat(left.slice(leftIndex), right.slice(rightIndex));
+  };
