@@ -1,6 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import General from "./General";
-import  parseExpression  from "./ParseExpression";
+import  { parseExpression }  from "./ParseExpression"
+import  generateGrid  from "./generateGrid";
+import { ViewBox } from "./types"; // Import the ViewBox type
+// Define the ViewBox type
+
 
 let LibraryController = ({
     expressions,
@@ -31,12 +35,15 @@ let LibraryController = ({
       const zoomFactor = e.deltaY > 0 ? 1.1 : 0.9;
   
       setViewBox((prev: { x: number; y: number; width: number; height: number }) => {
+        
         const centerX = prev.x + prev.width / 2;
         const centerY = prev.y + prev.height / 2;
   
         const newWidth = prev.width * zoomFactor;
         const newHeight = prev.height * zoomFactor;
-  
+        if (newWidth > 10000 || newHeight < 0.001) {
+          return prev; // Prevent zooming out too much
+        }
         return {
           width: newWidth,
           height: newHeight,
@@ -57,67 +64,55 @@ let LibraryController = ({
         svg.removeEventListener("wheel", handleWheel);
       };
     }, []);
-  
+    const getStrokeWidth = (viewBox: ViewBox): number => {
+      // Adjust multiplier to your liking
+      return viewBox.width / 1000;
+    };
+    const strokeWidth = getStrokeWidth(viewBox);
+   
+    const grid = generateGrid(viewBox);
     return (
-      <svg
+        <svg
         ref={svgRef}
         width="1000"
         height="1000"
         viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
         style={{ width: "100%", height: "auto", border: "1px solid black" }}
       >
-        <rect x="-15" y="-15" width="30" height="30" fill="white" />
+        <rect
+          x={viewBox.x}
+          y={viewBox.y}
+          width={viewBox.width}
+          height={viewBox.height}
+          fill="white"
+        />
+ <g fill="none" stroke="black" strokeWidth={strokeWidth}>
   
-        <g stroke="lightgray" stroke-width="0.1">
-          <line x1="-15" y1="0" x2="15" y2="0" stroke="black" />
-          <line y1="-15" y2="15" x1="0" x2="0" stroke="black" />
+ {data} 
+ </g>
+        
+        
+        <g stroke="lightgray" strokeWidth={strokeWidth}>
+          {grid.vertical.map((x) => (
+            <line key={`v-${x}`} x1={x} y1={viewBox.y} x2={x} y2={viewBox.y + viewBox.height} />
+          ))}
+          {grid.horizontal.map((y) => (
+            <line key={`h-${y}`} y1={y} x1={viewBox.x} y2={y} x2={viewBox.x + viewBox.width} />
+          ))}
         </g>
-  
-        <g stroke-width="0.1" stroke="lightgray">
-          <line x1="-10" y1="-15" x2="-10" y2="15" />
-          <line x1="-5" y1="-15" x2="-5" y2="15" />
-  
-          <line x1="5" y1="-15" x2="5" y2="15" />
-          <line x1="10" y1="-15" x2="10" y2="15" />
+      
+      
+        <line x1={viewBox.x} y1={0} x2={viewBox.x + viewBox.width} y2={0} stroke="black"  strokeWidth={strokeWidth}/>
+        <line x1={0} y1={viewBox.y} x2={0} y2={viewBox.y + viewBox.height} stroke="black" strokeWidth={strokeWidth}/>
+      
+        
+        <g fontFamily="Arial" fontSize={0.5 * (viewBox.width / 30)} fill="black" textAnchor="middle">
+          {grid.labels.map((label, i) => (
+            <text key={`label-${i}`} x={label.x} y={label.y}>
+              {label.text}
+            </text>
+          ))}
         </g>
-  
-        <g stroke-width="0.1" stroke="lightgray">
-          <line y1="-10" x1="-15" y2="-10" x2="15" />
-          <line y1="-5" x1="-15" y2="-5" x2="15" />
-  
-          <line y1="5" x1="-15" y2="5" x2="15" />
-          <line y1="10" x1="-15" y2="10" x2="15" />
-        </g>
-        {data}
-        <g font-family="Arial" font-size="0.5" fill="black" text-anchor="middle">
-          <text x="-10" y="-0.5">
-            -10
-          </text>
-          <text x="-5" y="-0.5">
-            -5
-          </text>
-          <text x="5" y="-0.5">
-            5
-          </text>
-          <text x="10" y="-0.5">
-            10
-          </text>
-  
-          <text x="0.5" y="-10">
-            10
-          </text>
-          <text x="0.5" y="-5">
-            5
-          </text>
-          <text x="0.5" y="5">
-            -5
-          </text>
-          <text x="0.5" y="10">
-            -10
-          </text>
-        </g>
-  
-        <text fontSize="0.5" fill="black"></text>
       </svg>
     );
   };

@@ -1,4 +1,4 @@
-let evaluator = (expression: string[], x: number) => {
+export const evaluator = (expression: string[], x: number) => {
     expression = expression.map((item) =>
       item === "x" ? x.toString() : item.toString()
     );
@@ -75,7 +75,7 @@ let evaluator = (expression: string[], x: number) => {
   
     return expression[0];
   };
-  
+
   const OPERATORS = [
     { symbol: "^", fn: (a: number, b: number) => Math.pow(a, b) },
     { symbol: "*", fn: (a: number, b: number) => a * b },
@@ -108,3 +108,5 @@ let evaluator = (expression: string[], x: number) => {
     { symbol: ["(", ")"], fn: (a: number) => a },
     { symbol: ["|", "|"], fn: (a: number) => Math.abs(a) },
   ];
+
+  
