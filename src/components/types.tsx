@@ -1,7 +1,8 @@
 export type FunctionData = {
+    id : number;
     color: string;
     expression: string[];
-    pathArray: string[][];
+    pathArray: coords[][];
   };
 
  export type ViewBox = {
@@ -9,4 +10,8 @@ export type FunctionData = {
     y: number;
     width: number;
     height: number;
+  };
+  export type coords = {
+    x: number;
+    y: number;
   };

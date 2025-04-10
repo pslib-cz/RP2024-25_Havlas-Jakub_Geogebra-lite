@@ -4,8 +4,8 @@ import  { parseExpression }  from "./ParseExpression"
 import  generateGrid  from "./generateGrid";
 import { ViewBox } from "./types"; // Import the ViewBox type
 // Define the ViewBox type
-
-
+import {  getFunctionDataByExpression, replaceFunction, addFunction, flushFunctionData } from './SessionStorage';
+import { FunctionData } from './types';
 let LibraryController = ({
     expressions,
     params,
@@ -19,12 +19,32 @@ let LibraryController = ({
       width: params.width,
       height: params.height,
     });
+
+    
     let data: React.ReactElement[] = [];
+   
+  for (let i = 0; i < expressions.length; i++) {
+    let expression = parseExpression(expressions[i]);
     
-    let result = parseExpression(expressions[0]); // Parse the expression
-    let isMatched = false;
+    let storedExpression: FunctionData | undefined = getFunctionDataByExpression(expression);
+    if (storedExpression) {
+     
+      data.push(<General expression={expression} viewBox={viewBox} storedExpression={storedExpression} />);
+    }else {
+      data.push(<General expression={expression} viewBox={viewBox} />);
+     
+    }
+   
+  }
+
+
+
+
     
-      data.push(<General expression={result} viewBox={viewBox} />);
+
+   
+    
+     
     
   
     const svgRef = useRef<SVGSVGElement | null>(null);
