@@ -9,3 +9,7 @@
 		- nějak předpokládat jestli se bude y hodně měnit, když ne, tak zvětšit krok, když ano tak zmenšit krok
 	b, local storage
 		- implementovat paměť abych nemusel kalkulovat všechny body znova ale jen dopočítal některé navíc.
+
+conclusion:
+usebound
+useMemo
