@@ -1,6 +1,8 @@
 import { evaluator } from "./Evaluator";
 import {addFunction} from "./SessionStorage";
 import { coords, FunctionData } from "./types";
+import { useMemo } from "react";
+
 let General = ({
   expression,
   viewBox,
@@ -10,6 +12,9 @@ let General = ({
   viewBox: { x: number; y: number; width: number; height: number };
   storedExpression?: FunctionData;
 }) => {
+
+
+ 
   let result = expression;
   let lock2 = storedExpression ? true : false;
 
@@ -20,25 +25,22 @@ let General = ({
   let lastY = 1000;
   let j = 0;
   let step = viewBox.width / 1000; // Initial step size
-let tp: number | undefined = undefined;
-let tp2: number | undefined = undefined;
-  if (storedExpression && storedExpression.pathArray[0][0].x < viewBox.x){
-    tp = storedExpression.pathArray[storedExpression.pathArray.length - 1][storedExpression.pathArray[storedExpression.pathArray.length - 1].length - 1].x;
-    tp2 = storedExpression.pathArray[storedExpression.pathArray.length - 1][storedExpression.pathArray[storedExpression.pathArray.length - 1].length - 1].x;
-  }else if (storedExpression && storedExpression.pathArray[storedExpression.pathArray.length - 1][storedExpression.pathArray[storedExpression.pathArray.length - 1].length - 1].x > viewBox.x){
 
-  }else {
-
-  }
   let paths: coords[][] = [];
+
+  const newGraph = useMemo(() => {
+    console.log("Computing newGraph summary...");
+    return `viewBox: ${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`;
+  }, [expression]);
+
+
+
+  const combinedGraph = useMemo(() => {
+    console.log("Computing combinedGraph summary...");
+    return expression.join(" ");
+  }, [viewBox]);
   for (let i = viewBox.x; i < viewBox.width; i = i + step) {
-    if (tp !== undefined && i > tp && tp2 !== undefined) {
-        i = tp2;
-
-
-
-
-    }
+   
 
     let x = i;
     let y = parseFloat(evaluator(result, i));
@@ -49,7 +51,7 @@ let tp2: number | undefined = undefined;
     //smart step
     if (Math.abs(lastY - y) < 0.001) {
       step = viewBox.width / 1000;
-      continue;
+      
     }
     if (Math.abs(lastY - y) > 1) {
       step = viewBox.width / 100000;
@@ -74,7 +76,7 @@ let tp2: number | undefined = undefined;
     } else {
       lastY = y;
     }
-   
+  
     if (lock) {
       let a: coords = { x: x, y: y };
       if (!paths[j]) {
@@ -82,15 +84,15 @@ let tp2: number | undefined = undefined;
       }
       paths[j][0] = a;
     
-      pathArray[j] = `M ${Math.round(x * 1000) / 1000} ${
-        Math.round(-y * 1000) / 1000
+      pathArray[j] = `M ${Math.round(x * 1000000) / 1000000} ${
+        Math.round(-y * 1000000) / 1000000
       } `;
       lock = false;
     } else {
       paths[j].push({ x: x, y: y });
       pathArray[j] =
         pathArray[j] +
-        `L ${Math.round(x * 1000) / 1000} ${Math.round(-y * 1000) / 1000} `;
+        `L ${Math.round(x * 1000000) / 1000000} ${Math.round(-y * 1000000) / 1000000} `;
     }
   }
   if (lock2) {

@@ -5,7 +5,7 @@ function App() {
   return (
     <>
       <LibraryController
-        expressions={["x^2"]}
+        expressions={["(x+1)/(x-1)"]}
         params={{ x: -2, y: -2, width: 4, height: 4 }}
       />
     </>

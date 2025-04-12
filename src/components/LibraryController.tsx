@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import General from "./General";
-import  { parseExpression }  from "./ParseExpression"
-import  generateGrid  from "./generateGrid";
-import { ViewBox } from "./types"; // Import the ViewBox type
+import  { parseExpression }  from "./utils/ParseExpression"
+import  generateGrid  from "./utils/generateGrid";
+import { ViewBox } from "./types"; 
+import useDebounce from "./CustomHooks/useDebounce";
 // Define the ViewBox type
 import {  getFunctionDataByExpression, replaceFunction, addFunction, flushFunctionData } from './SessionStorage';
 import { FunctionData } from './types';
@@ -19,8 +20,10 @@ let LibraryController = ({
       width: params.width,
       height: params.height,
     });
-
-    
+    const [debouncedViewBox, setDebouncedViewBox] = useState(viewBox);
+    useDebounce(() => {
+      setDebouncedViewBox(viewBox);
+    }, 300, [viewBox]);
     let data: React.ReactElement[] = [];
    
   for (let i = 0; i < expressions.length; i++) {
@@ -29,9 +32,9 @@ let LibraryController = ({
     let storedExpression: FunctionData | undefined = getFunctionDataByExpression(expression);
     if (storedExpression) {
      
-      data.push(<General expression={expression} viewBox={viewBox} storedExpression={storedExpression} />);
+      data.push(<General expression={expression} viewBox={debouncedViewBox} storedExpression={storedExpression} />);
     }else {
-      data.push(<General expression={expression} viewBox={viewBox} />);
+      data.push(<General expression={expression} viewBox={debouncedViewBox} />);
      
     }
    
@@ -108,7 +111,7 @@ let LibraryController = ({
         />
  <g fill="none" stroke="black" strokeWidth={strokeWidth}>
   
- {data} 
+ {viewBox === debouncedViewBox ? data : null}
  </g>
         
         
