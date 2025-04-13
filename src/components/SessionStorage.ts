@@ -39,3 +39,10 @@ export const getFunctionDataByExpression = (expression: string[]): FunctionData 
   export const flushFunctionData = (): void => {
     appData.functions = [];
   };
+
+  export const replacePathArray = (pathArray: coords[][], id: number): void => {
+    const index = appData.functions.findIndex(func => func.id === id);
+    if (index) {
+        appData.functions[index].pathArray = pathArray;
+    }
+  }
