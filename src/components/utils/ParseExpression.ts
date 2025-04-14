@@ -1,20 +1,39 @@
 
 export const parseExpression = (expression: string) => {
-    // Remove spaces
-    const cleanedExpr = expression.replace(/\s+/g, "");
-  
-    // Regex to match function names, numbers, operators, and parentheses
-    const tokenRegex = /([a-zA-Z]+)|(\d*\.\d+|\d+)|([+\-*/^()|])/g;
-    const rawTokens = cleanedExpr.match(tokenRegex) || [];
-  
-    // Process tokens: numbers as float, functions/operators as strings
-    const parsedTokens = rawTokens.map((token) => {
-      if (/^\d*\.?\d+$/.test(token)) {
-        return token;
-      }
-      return token;
-    });
-  
-    return parsedTokens;
-  };
+  const cleanedExpr = expression.replace(/\s+/g, "");
+
+  // Match numbers, operators, parentheses, and individual letters or function names
+  const tokenRegex = /(\d*\.\d+|\d+|[a-zA-Z]+|[+\-*/^()|])/g;
+  let rawTokens = cleanedExpr.match(tokenRegex) || [];
+
+  const parsedTokens: string[] = [];
+
+  for (let i = 0; i < rawTokens.length; i++) {
+    const curr = rawTokens[i];
+    const next = rawTokens[i + 1];
+
+    parsedTokens.push(curr);
+
+    if (!next) continue;
+
+    const isNumber = /^\d*\.?\d+$/.test(curr);
+    const isAlpha = /^[a-zA-Z]+$/.test(curr);
+    const isClosing = curr === ")" || curr === "|";
+
+    const nextIsAlpha = /^[a-zA-Z]+$/.test(next);
+    const nextIsOpening = next === "(" || next === "|";
+    const nextIsNumber = /^\d*\.?\d+$/.test(next);
+
+    // Insert "*" between:
+    // number/function/variable/closing → opening/function/variable/number
+    if (
+      (isNumber || isAlpha || isClosing) &&
+      (nextIsAlpha || nextIsOpening || nextIsNumber)
+    ) {
+      parsedTokens.push("*");
+    }
+  }
+
+  return parsedTokens;
+};
 

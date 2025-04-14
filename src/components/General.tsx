@@ -92,6 +92,7 @@ const computePartialGraph = (
     //viewbox is smaller
     // higher detail is needed
   }
+  let recentPoints: coords[] = [];
   // (Add any additional custom logic as needed.)
   let storedsegmentIndex = 1;
   for (let i = viewBox.x; i < viewBox.width / 2; i += localStep) {
@@ -105,13 +106,48 @@ const computePartialGraph = (
       i = tp
       localLock = true;
       segmentIndex++;
-      fire = undefined;
-      tp = undefined;
+      if ( storedPaths[storedsegmentIndex]) {
+        fire = storedPaths[storedsegmentIndex][0].x;
+        let lastSegment = storedPaths[storedsegmentIndex];
+        tp = lastSegment[lastSegment.length - 1].x;
+
+        storedsegmentIndex++;
+      }else {
+        fire = undefined;
+        tp = undefined;
+      }
+
+      
     } 
     let x = i;
     let y = parseFloat(evaluator(expression, i));
     if (isNaN(y)) continue;
-
+/*
+    const point: coords = { x, y };
+    
+    recentPoints.push(point);
+    
+    // Keep only the latest 51 points (we need up to x-50)
+    if (recentPoints.length > 51) recentPoints.shift();
+    // SMART STEP BABY
+    if (
+      recentPoints.length >= 51 // ensure we have enough data
+    ) {
+      const samplePoints = [
+        recentPoints[recentPoints.length - 1],   // x - 1
+        recentPoints[recentPoints.length - 2],   // x - 2
+        recentPoints[recentPoints.length - 5],   // x - 5
+        recentPoints[recentPoints.length - 10],  // x - 10
+        recentPoints[recentPoints.length - 50],  // x - 50
+      ];
+    let avg = determinedNextStep(samplePoints);
+    console.log("Average Angle: ", avg);
+      if (avg == 1){
+        
+        localStep = viewBox.width / 50;
+      }
+    }
+    */
     // Adjust step dynamically
     if (Math.abs(localLastY - y) < 0.001) {
       localStep = viewBox.width / 1000;
@@ -126,6 +162,7 @@ const computePartialGraph = (
      if (Math.abs(localLastY - y) > 1) {
       localStep = viewBox.width / 100000;
     }
+    
     /*
     if (Math.abs(y - localLastY) > threshold) {
       
@@ -168,9 +205,9 @@ const computePartialGraph = (
     ...storedExpression,
     pathArray: preparedToSaveData,
   };
-  
+
   const mergedPaths = pathsToDStrings(updatedExpression.pathArray);
-  
+  console.log("Merged Paths: ", mergedPaths);
   return mergedPaths.map((d, index) => (
     <path key={index} d={d} stroke="black" fill="none" />
   ));
@@ -268,3 +305,34 @@ function sortAndMergeCoords(groups: coords[][]): coords[][] {
 
     return result;
 }
+const determinedNextStep = (points: coords[]) => {
+  if (points.length < 2) return 1;
+
+  // Calculate direction vectors
+  const vectors: { dx: number; dy: number }[] = [];
+  for (let i = 1; i < points.length; i++) {
+    const dx = points[i].x - points[i - 1].x;
+    const dy = points[i].y - points[i - 1].y;
+    vectors.push({ dx, dy });
+  }
+
+  // Calculate angle changes between vectors
+  let totalAngle = 0;
+  for (let i = 1; i < vectors.length; i++) {
+    const v1 = vectors[i - 1];
+    const v2 = vectors[i];
+
+    const dot = v1.dx * v2.dx + v1.dy * v2.dy;
+    const mag1 = Math.sqrt(v1.dx ** 2 + v1.dy ** 2);
+    const mag2 = Math.sqrt(v2.dx ** 2 + v2.dy ** 2);
+    if (mag1 === 0 || mag2 === 0) continue; // Avoid division by zero
+
+    const angle = Math.acos(Math.max(-1, Math.min(1, dot / (mag1 * mag2))));
+    totalAngle += angle;
+  }
+
+  const avgAngle = totalAngle / (vectors.length - 1);
+
+  
+  return avgAngle; // mostly straight
+};

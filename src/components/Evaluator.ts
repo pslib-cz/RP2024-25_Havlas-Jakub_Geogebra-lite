@@ -1,8 +1,14 @@
 export const evaluator = (expression: string[], x: number) => {
-    expression = expression.map((item) =>
-      item === "x" ? x.toString() : item.toString()
-    );
-  
+  expression = insertImplicitMultiplication(expression);
+  expression = expression.map((item) => {
+    if (item === "x") return x.toString();
+
+    const constant = constants.find((c) => c.symbol === item.toLowerCase());
+    if (constant) return constant.value.toString();
+
+    return item.toString();
+  });
+
     for (const { symbol, fn } of brackets) {
       for (let i = 0; i < expression.length; i++) {
         if (expression[i] === symbol[0]) {
@@ -10,7 +16,7 @@ export const evaluator = (expression: string[], x: number) => {
           let depth = 1;
   
           if (symbol[0] === "|") {
-            // Special handling for absolute value bars
+            
             let openIndex = i;
             for (let j = i + 1; j < expression.length; j++) {
               if (expression[j] === "|") {
@@ -89,7 +95,7 @@ export const evaluator = (expression: string[], x: number) => {
     { symbol: "cos", fn: (a: number) => Math.cos(a) },
     { symbol: "tan", fn: (a: number) => Math.tan(a) },
     { symbol: "log", fn: (a: number) => Math.log10(a) },
-  
+    { symbol: "cotan", fn: (a: number) => 1/Math.tan(a) },
     { symbol: "sqrt", fn: (a: number) => Math.sqrt(a) },
   ];
   const constants = [
@@ -109,4 +115,38 @@ export const evaluator = (expression: string[], x: number) => {
     { symbol: ["|", "|"], fn: (a: number) => Math.abs(a) },
   ];
 
+  const variables = [
+    { symbol: "x", value: 0 },
+    { symbol: "y", value: 0 },
+    { symbol: "z", value: 0 },
+  ];
+
+  const insertImplicitMultiplication = (tokens: string[]): string[] => {
+    const result: string[] = [];
   
+    for (let i = 0; i < tokens.length; i++) {
+      result.push(tokens[i]);
+  
+      const curr = tokens[i];
+      const next = tokens[i + 1];
+  
+      if (!next) continue;
+  
+      const isNumber = (s: string) => !isNaN(parseFloat(s));
+      const isVariableOrFunc = (s: string) =>
+        s === "x" || constants.some(c => c.symbol === s) || functions.some(f => f.symbol === s);
+  
+      const isOpenBracket = next === "(" || next === "|";
+  
+      // If current token is a number, variable, constant or closing bracket
+      // and next is a variable, function, or opening bracket => insert *
+      if (
+        (isNumber(curr) || curr === "x" || curr === ")" || curr === "|" || constants.some(c => c.symbol === curr)) &&
+        (isVariableOrFunc(next) || isOpenBracket)
+      ) {
+        result.push("*");
+      }
+    }
+  
+    return result;
+  };
