@@ -88,6 +88,9 @@ const computePartialGraph = (
     fire = storedPaths[0][0].x;
     let lastSegment = storedPaths[0];
     tp = lastSegment[lastSegment.length - 1].x;
+  }else {
+    //viewbox is smaller
+    // higher detail is needed
   }
   // (Add any additional custom logic as needed.)
   let storedsegmentIndex = 1;
@@ -97,18 +100,14 @@ const computePartialGraph = (
 
 
     if (
-      storedsegmentIndex < storedPaths.length &&
-      Array.isArray(storedPaths[storedsegmentIndex]) &&
-      storedPaths[storedsegmentIndex].length > 0
+      fire && fire < i && tp
     ) {
-      fire = storedPaths[storedsegmentIndex][0].x;
-      let lastSegment = storedPaths[storedsegmentIndex];
-      tp = lastSegment[lastSegment.length - 1].x;
-      storedsegmentIndex++;
-    } else {
+      i = tp
+      localLock = true;
+      segmentIndex++;
       fire = undefined;
       tp = undefined;
-    }
+    } 
     let x = i;
     let y = parseFloat(evaluator(expression, i));
     if (isNaN(y)) continue;
@@ -127,10 +126,12 @@ const computePartialGraph = (
      if (Math.abs(localLastY - y) > 1) {
       localStep = viewBox.width / 100000;
     }
+    /*
     if (Math.abs(y - localLastY) > threshold) {
       
       y = y > localLastY ? viewBox.height : -viewBox.height;
     }
+      */
     if (y > -viewBox.y + 5) continue
     if (y < viewBox.y - 5) continue;
 
@@ -157,12 +158,19 @@ const computePartialGraph = (
     }
   }
  
-  const combinedPaths = localPaths.concat(storedPaths)
-  logArray(combinedPaths);
-  //const preparedToSaveData = sortAndMergeCoords(combinedPaths);
-  //replacePathArray(preparedToSaveData, storedExpression.id);
-  const mergedPaths = pathsToDStrings(combinedPaths);
- console.log("Merged Paths: ", mergedPaths);
+  
+  const combinedPaths = [...localPaths.map(path => [...path]), ...storedPaths.map(path => [...path])];
+
+
+  const preparedToSaveData = sortAndMergeCoords(combinedPaths);
+
+  const updatedExpression: FunctionData = {
+    ...storedExpression,
+    pathArray: preparedToSaveData,
+  };
+  
+  const mergedPaths = pathsToDStrings(updatedExpression.pathArray);
+  
   return mergedPaths.map((d, index) => (
     <path key={index} d={d} stroke="black" fill="none" />
   ));
@@ -233,9 +241,7 @@ function sortAndMergeCoords(groups: coords[][]): coords[][] {
     const validGroups = groups.filter(g => Array.isArray(g) && g.length > 0);
 
     // Step 1: Sort groups by the first x
-    const sorted = validGroups.sort((a, b) => {
-        return a[0].x - b[0].x;
-    });
+    const sorted = [...validGroups].sort((a, b) => a[0].x - b[0].x);
 
     // Step 2: Merge groups where appropriate
     const result: coords[][] = [];

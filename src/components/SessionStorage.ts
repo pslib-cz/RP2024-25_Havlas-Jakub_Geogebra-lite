@@ -41,8 +41,19 @@ export const getFunctionDataByExpression = (expression: string[]): FunctionData 
   };
 
   export const replacePathArray = (pathArray: coords[][], id: number): void => {
+    
     const index = appData.functions.findIndex(func => func.id === id);
-    if (index) {
+    if (index !== -1)  {
         appData.functions[index].pathArray = pathArray;
+        logArray(appData.functions[index].pathArray);
     }
   }
+
+  const logArray = (array: coords[][]) => {
+    array.forEach((segment, index) => {
+      console.log(`Segment ${index}:`);
+      segment.forEach(point => {
+        console.log(`x: ${point.x}, y: ${point.y}`);
+      });
+    });
+  };

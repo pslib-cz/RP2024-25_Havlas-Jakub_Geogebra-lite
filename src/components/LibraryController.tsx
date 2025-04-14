@@ -31,10 +31,11 @@ let LibraryController = ({
     
     let storedExpression: FunctionData | undefined = getFunctionDataByExpression(expression);
     if (storedExpression) {
+      
+      data[i] = <General expression={expression} viewBox={debouncedViewBox} storedExpression={storedExpression} />;
      
-      data.push(<General expression={expression} viewBox={debouncedViewBox} storedExpression={storedExpression} />);
     }else {
-      data.push(<General expression={expression} viewBox={debouncedViewBox} />);
+      data[i] =<General expression={expression} viewBox={debouncedViewBox} />;
      
     }
    
