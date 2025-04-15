@@ -2,7 +2,6 @@
 export const parseExpression = (expression: string) => {
   const cleanedExpr = expression.replace(/\s+/g, "");
 
-  // Match numbers, operators, parentheses, and individual letters or function names
   const tokenRegex = /(\d*\.\d+|\d+|[a-zA-Z]+|[+\-*/^()|])/g;
   let rawTokens = cleanedExpr.match(tokenRegex) || [];
 
@@ -24,11 +23,14 @@ export const parseExpression = (expression: string) => {
     const nextIsOpening = next === "(" || next === "|";
     const nextIsNumber = /^\d*\.?\d+$/.test(next);
 
-    // Insert "*" between:
-    // number/function/variable/closing → opening/function/variable/number
+    // Don't insert "*" between opening brackets and what's inside
+    const isOpening = curr === "(" || curr === "|";
+
+    // Only insert "*" if not both sides are opening symbols
     if (
       (isNumber || isAlpha || isClosing) &&
-      (nextIsAlpha || nextIsOpening || nextIsNumber)
+      (nextIsAlpha || nextIsOpening || nextIsNumber) &&
+      !(isOpening || next === ")" || next === "|")
     ) {
       parsedTokens.push("*");
     }

@@ -1,5 +1,5 @@
 export const evaluator = (expression: string[], x: number) => {
-  expression = insertImplicitMultiplication(expression);
+  //expression = insertImplicitMultiplication(expression);
   expression = expression.map((item) => {
     if (item === "x") return x.toString();
 
@@ -8,44 +8,35 @@ export const evaluator = (expression: string[], x: number) => {
 
     return item.toString();
   });
-
-    for (const { symbol, fn } of brackets) {
-      for (let i = 0; i < expression.length; i++) {
-        if (expression[i] === symbol[0]) {
-          let openIndex = i;
-          let depth = 1;
+console.log(expression);
+  for (const { symbol, fn } of brackets) {
+    let i = 0;
+    while (i < expression.length) {
+      if (expression[i] === symbol[0]) {
+        const openIndex = i;
+        let depth = 1;
   
-          if (symbol[0] === "|") {
-            
-            let openIndex = i;
-            for (let j = i + 1; j < expression.length; j++) {
-              if (expression[j] === "|") {
-                const subExpr = expression.slice(openIndex + 1, j);
-                let result = evaluator(subExpr, x);
-                result = Math.abs(parseFloat(result)).toString();
-                expression.splice(openIndex, j - openIndex + 1, result);
-                i = openIndex - 1;
-                break;
-              }
-            }
-          }
-          for (let j = i + 1; j < expression.length; j++) {
-            if (expression[j] === symbol[0]) depth++;
-            if (expression[j] === symbol[1]) depth--;
+        for (let j = i + 1; j < expression.length; j++) {
+          if (expression[j] === symbol[0]) depth++;
+          if (expression[j] === symbol[1]) depth--;
   
-            if (depth === 0) {
-              const subExpr = expression.slice(openIndex + 1, j);
-              let result = evaluator(subExpr, x);
+          if (depth === 0) {
+            const subExpr = expression.slice(openIndex + 1, j);
+            let result = evaluator(subExpr, x);
   
-              expression.splice(openIndex, j - openIndex + 1, result); // replace ( ... ) with result
-              i = openIndex - 1; // rewind to recheck
-              break;
-            }
+            // Apply function (abs or passthrough)
+            result = fn(parseFloat(result)).toString();
+  
+            // Replace from open to close with result
+            expression.splice(openIndex, j - openIndex + 1, result);
+            i = openIndex; // reset i to just before new element
+            break;
           }
         }
       }
+      i++;
     }
-  
+  }
     for (const { symbol, fn } of functions) {
       for (let i = expression.length - 1; i >= 0; i--) {
         if (expression[i] === symbol) {
