@@ -6,12 +6,12 @@ import { ViewBox } from "./types";
 import useDebounce from "./CustomHooks/useDebounce";
 // Define the ViewBox type
 import {  getFunctionDataByExpression, replaceFunction, addFunction, flushFunctionData } from './SessionStorage';
-import { FunctionData } from './types';
+import { FunctionData, reqs } from './types';
 let LibraryController = ({
-    expressions,
+    reqs,
     params,
   }: {
-    expressions: string[];
+    reqs: reqs[];
     params: { x: number; y: number; width: number; height: number };
   }) => {
     const [viewBox, setViewBox] = useState({
@@ -26,16 +26,16 @@ let LibraryController = ({
     }, 300, [viewBox]);
     let data: React.ReactElement[] = [];
    
-  for (let i = 0; i < expressions.length; i++) {
-    let expression = parseExpression(expressions[i]);
+  for (let i = 0; i < reqs.length; i++) {
+    let expression = parseExpression(reqs[i].expression);
     
     let storedExpression: FunctionData | undefined = getFunctionDataByExpression(expression);
     if (storedExpression) {
       
-      data[i] = <General expression={expression} viewBox={debouncedViewBox} storedExpression={storedExpression} />;
+      data[i] = <General  key={i}  expression={expression} viewBox={debouncedViewBox} storedExpression={storedExpression} color={reqs[i].color}/>;
      
     }else {
-      data[i] =<General expression={expression} viewBox={debouncedViewBox} />;
+      data[i] =<General  key={i}  expression={expression} viewBox={debouncedViewBox}  color={reqs[i].color}/>;
      
     }
    

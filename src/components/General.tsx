@@ -5,7 +5,7 @@ import { coords, FunctionData } from "./types";
 import mergeCoords from "./utils/mergeArrays";
 type ViewBox = { x: number; y: number; width: number; height: number };
 
-const computeFullGraph = (expression: string[], viewBox: ViewBox) => {
+const computeFullGraph = (expression: string[], viewBox: ViewBox,  color?: string) => {
   let localStep = viewBox.width / 1000;
   
   let localLastY = 1000;
@@ -14,35 +14,44 @@ const computeFullGraph = (expression: string[], viewBox: ViewBox) => {
   let localLock = true;
   let segmentIndex = 0;
   let recentPoints: coords[] = [];
- 
+ let counter = 0;
   for (let i = viewBox.x; i < viewBox.width; i += localStep) {
     let x = i;
     
     let y = parseFloat(evaluator(expression, i));
-    console.log("X: ", x, "Y: ", y);
+   
     if (isNaN(y)) continue;
+    /*
     const point: coords = { x, y };
     
-    recentPoints.push(point);
+   
+    if ( counter % 100 == 0){
+      recentPoints.push(point);
+      counter = 0;
+    }else {
+      counter++;
+    }
    
    
     // Keep only the latest 51 points (we need up to x-50)
-    if (recentPoints.length > 31) recentPoints.shift();
+    if (recentPoints.length > 21) recentPoints.shift();
     // SMART STEP BABY
     if (
-      recentPoints.length >= 31 // ensure we have enough data
+      recentPoints.length >= 21 // ensure we have enough data
+
     ) {
+      let a = computeHybridLikelihood(recentPoints);
+      if ( a ==  0 ){
+        a = 0.1;
+      } else if ( a == 1 ){
+        a = 0.5;
+      }
       
- 
-      
+      localStep = localStep / a;
+      if (localStep > viewBox.width / 50) localStep = viewBox.width / 50;
+      console.log("Likelihood: ", localStep);
     }
-    // Adjust step dynamically
-    if (Math.abs(localLastY - y) < 0.001) {
-      localStep = viewBox.width / 1000;
-    }
-    if (Math.abs(localLastY - y) > 1) {
-      localStep = viewBox.width / 100000;
-    }
+    */
     
     // Clamping based on viewBox
     if (y > -viewBox.y +1) continue
@@ -72,21 +81,22 @@ const computeFullGraph = (expression: string[], viewBox: ViewBox) => {
 
   // Cache the result
   addFunction({
-    color: "black",
+    color: `${color || "black"}`,
     expression,
     pathArray: localPaths,
   });
 
   // Return rendered paths
   return localPathArray.map((d, index) => (
-    <path key={index} d={d} stroke="black" fill="none" />
+    <path key={index} d={d} stroke={color || "black"} fill="none" />
   ));
 };
 
 const computePartialGraph = (
   expression: string[],
   viewBox: ViewBox,
-  storedExpression: FunctionData
+  storedExpression: FunctionData,
+  color?: string
 ) => {
   // Only update the parts based on the viewBox
   let localStep = viewBox.width / 1000;
@@ -113,6 +123,7 @@ const computePartialGraph = (
   let recentPoints: coords[] = [];
   // (Add any additional custom logic as needed.)
   let storedsegmentIndex = 1;
+  let counter = 0;
   for (let i = viewBox.x; i < viewBox.width / 2; i += localStep) {
     
   
@@ -140,37 +151,36 @@ const computePartialGraph = (
     let x = i;
     let y = parseFloat(evaluator(expression, i));
     if (isNaN(y)) continue;
-
+/*
     const point: coords = { x, y };
+    if ( counter % 100 == 0){
+      recentPoints.push(point);
+      counter = 0;
+    }else {
+      counter++;
+    }
     
-    recentPoints.push(point);
     
     // Keep only the latest 51 points (we need up to x-50)
-    if (recentPoints.length > 51) recentPoints.shift();
+    if (recentPoints.length > 21) recentPoints.shift();
     // SMART STEP BABY
     if (
-      recentPoints.length >= 51 // ensure we have enough data
+      recentPoints.length >= 21 // ensure we have enough data
+
     ) {
+      let a = computeHybridLikelihood(recentPoints);
+      if ( a ==  0 ){
+        a = 0.1;
+      } else if ( a == 1 ){
+        a = 0.5;
+      }
       
+      localStep = localStep / a;
+      if (localStep > viewBox.width / 50) localStep = viewBox.width / 50;
+      console.log("Likelihood: ", localStep);
+    }
+    */
    
-      
-    }
-    
-    // Adjust step dynamically
-    if (Math.abs(localLastY - y) < 0.001) {
-      localStep = viewBox.width / 1000;
-    }
-    /*
-    if (Math.abs(localLastY - y) > 1500) {
-      localStep = viewBox.width / 10000000;
-    }
-    if (Math.abs(localLastY - y) > 200) {
-      localStep = viewBox.width / 1000000;
-      }*/
-     if (Math.abs(localLastY - y) > 1) {
-      localStep = viewBox.width / 100000;
-    }
-    
     /*
     if (Math.abs(y - localLastY) > threshold) {
       
@@ -215,9 +225,9 @@ const computePartialGraph = (
   };
 
   const mergedPaths = pathsToDStrings(updatedExpression.pathArray);
-  console.log("Merged Paths: ", mergedPaths);
+  
   return mergedPaths.map((d, index) => (
-    <path key={index} d={d} stroke="black" fill="none" />
+    <path key={index} d={d} stroke={color || "black"} fill="none" />
   ));
 };
 
@@ -225,10 +235,12 @@ const General = ({
   expression,
   viewBox,
   storedExpression,
+  color
 }: {
   expression: string[];
   viewBox: ViewBox;
   storedExpression?: FunctionData;
+  color?: string;
 }) => {
 
   const graph = useMemo(() => {
@@ -236,10 +248,10 @@ const General = ({
     if (storedExpression && arraysEqual(storedExpression.expression, expression)) {
       
       console.log("B: computing partial graph update");
-      return computePartialGraph(expression, viewBox, storedExpression);
+      return computePartialGraph(expression, viewBox, storedExpression, color);
     } else {
       console.log("A: computing full graph");
-      return computeFullGraph(expression, viewBox);
+      return computeFullGraph(expression, viewBox, color);
     }
   }, [expression, viewBox, storedExpression]);
   
@@ -312,4 +324,69 @@ function sortAndMergeCoords(groups: coords[][]): coords[][] {
     }
 
     return result;
+}
+
+function angleBetween(a: coords, b: coords, c: coords): number {
+  const ab = { x: b.x - a.x, y: b.y - a.y };
+  const bc = { x: c.x - b.x, y: c.y - b.y };
+
+  const dot = ab.x * bc.x + ab.y * bc.y;
+  const magAB = Math.hypot(ab.x, ab.y);
+  const magBC = Math.hypot(bc.x, bc.y);
+
+  if (magAB === 0 || magBC === 0) return 0;
+
+  const cosTheta = dot / (magAB * magBC);
+  const clamped = Math.max(-1, Math.min(1, cosTheta)); // clamp to avoid floating point noise
+
+  const angleRad = Math.acos(clamped);
+  const angleDeg = (angleRad * 180) / Math.PI;
+
+  return angleDeg;
+}
+
+function computeHybridLikelihood(points: coords[]): number {
+  if (points.length < 3) return 0;
+
+  let totalAngle = 0;
+  let totalSlopeDelta = 0;
+  let count = 0;
+
+  for (let i = 0; i < points.length - 2; i++) {
+    const a = points[i], b = points[i + 1], c = points[i + 2];
+
+    // --- ANGLE ---
+    const angle = angleBetween(a, b, c);
+    const boostedAngle = Math.pow(angle / 180, 0.5); // sensitivity boost
+    if (!isNaN(boostedAngle) && isFinite(boostedAngle)) {
+      totalAngle += boostedAngle;
+    }
+
+    // --- SLOPE DELTA ---
+    const dx1 = b.x - a.x;
+    const dy1 = b.y - a.y;
+    const dx2 = c.x - b.x;
+    const dy2 = c.y - b.y;
+
+    if (dx1 === 0 || dx2 === 0) continue; // avoid divide by zero
+
+    const slope1 = dy1 / dx1;
+    const slope2 = dy2 / dx2;
+
+    const deltaSlope = Math.abs(slope2 - slope1);
+    if (!isNaN(deltaSlope) && isFinite(deltaSlope)) {
+      totalSlopeDelta += deltaSlope;
+    }
+
+    count++;
+  }
+
+  if (count === 0) return 0;
+
+  const avgAngle = totalAngle / count;
+  const avgDeltaSlope = totalSlopeDelta / count;
+
+  // Normalize: 0-1 range
+  const likelihood = Math.min(1, avgAngle + avgDeltaSlope / 10);
+  return Math.round(likelihood * 100);
 }

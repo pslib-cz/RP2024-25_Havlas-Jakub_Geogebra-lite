@@ -8,35 +8,69 @@ export const evaluator = (expression: string[], x: number) => {
 
     return item.toString();
   });
-console.log(expression);
-  for (const { symbol, fn } of brackets) {
-    let i = 0;
-    while (i < expression.length) {
-      if (expression[i] === symbol[0]) {
-        const openIndex = i;
-        let depth = 1;
-  
-        for (let j = i + 1; j < expression.length; j++) {
-          if (expression[j] === symbol[0]) depth++;
-          if (expression[j] === symbol[1]) depth--;
-  
+
+let foundParen = true;
+
+while (foundParen) {
+  foundParen = false;
+  let i = 0;
+
+  while (i < expression.length) {
+    if (expression[i] === "(") {
+      const openIndex = i;
+      let depth = 1;
+
+      for (let j = i + 1; j < expression.length; j++) {
+        if (expression[j] === "(") depth++;
+        if (expression[j] === ")") depth--;
+
+        if (depth === 0) {
+          const subExpr = expression.slice(openIndex + 1, j);
+          let result = evaluator(subExpr, x);
+
+          // Just grouping — no function applied
+          expression.splice(openIndex, j - openIndex + 1, result.toString());
+          i = openIndex;
+          foundParen = true;
+          break;
+        }
+      }
+    }
+    i++;
+  }
+}
+let foundAbs = true;
+
+while (foundAbs) {
+  foundAbs = false;
+  let i = 0;
+
+  while (i < expression.length) {
+    if (expression[i] === "|") {
+      const openIndex = i;
+      let depth = 1;
+
+      for (let j = i + 1; j < expression.length; j++) {
+        if (expression[j] === "|") {
+          depth--;
           if (depth === 0) {
             const subExpr = expression.slice(openIndex + 1, j);
             let result = evaluator(subExpr, x);
-  
-            // Apply function (abs or passthrough)
-            result = fn(parseFloat(result)).toString();
-  
-            // Replace from open to close with result
+
+            result = Math.abs(parseFloat(result)).toString();
+
             expression.splice(openIndex, j - openIndex + 1, result);
-            i = openIndex; // reset i to just before new element
+            i = openIndex;
+            foundAbs = true;
             break;
           }
         }
       }
-      i++;
     }
+    i++;
   }
+}
+
     for (const { symbol, fn } of functions) {
       for (let i = expression.length - 1; i >= 0; i--) {
         if (expression[i] === symbol) {

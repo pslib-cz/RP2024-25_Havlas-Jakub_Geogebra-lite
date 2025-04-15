@@ -3,13 +3,10 @@ import LibraryController from "./components/LibraryController";
 import "./App.css";
 import UserInput from "./UserInput";
 
-interface ExpressionData {
-  expression: string;
-  color: string;
-}
+import { reqs } from "./components/types";
 
 function App() {
-  const [expressions, setExpressions] = useState<ExpressionData[]>([]);
+  const [expressions, setExpressions] = useState<reqs[]>([]);
   const defaultParams = { x: -2, y: -2, width: 4, height: 4 };
 
   return (
@@ -17,7 +14,7 @@ function App() {
       <UserInput onSubmitExpressions={setExpressions} />
       {expressions.length > 0 && (
         <LibraryController
-          expressions={expressions.map((fn) => fn.expression)}
+          reqs={expressions}
           params={defaultParams}
         />
       )}
