@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { evaluator } from "./Evaluator";
 import { addFunction, replacePathArray } from "./SessionStorage";
 import { coords, FunctionData } from "./types";
-import mergeCoords from "./utils/mergeArrays";
+
 type ViewBox = { x: number; y: number; width: number; height: number };
 
 const computeFullGraph = (expression: string[], viewBox: ViewBox,  color?: string) => {
@@ -20,7 +20,7 @@ const computeFullGraph = (expression: string[], viewBox: ViewBox,  color?: strin
     
     let y = parseFloat(evaluator(expression, i));
    
-    if (isNaN(y)) continue;
+    if (isNaN(y)) {localLock = true; continue;}
     /*
     const point: coords = { x, y };
     
@@ -150,7 +150,7 @@ const computePartialGraph = (
     } 
     let x = i;
     let y = parseFloat(evaluator(expression, i));
-    if (isNaN(y)) continue;
+    if (isNaN(y)) {localLock = true; continue;}
 /*
     const point: coords = { x, y };
     if ( counter % 100 == 0){
@@ -270,6 +270,8 @@ const arraysEqual = (a: string[], b: string[]) =>
   a.length === b.length && a.every((val, index) => val === b[index]);
 export default General;
 
+//ai.
+//write a fc that would make a d string from coords[][]
 const pathsToDStrings = (paths: coords[][]): string[] => {
   return paths
     
@@ -282,8 +284,8 @@ const pathsToDStrings = (paths: coords[][]): string[] => {
       return commands.join(" ");
     });
 };
-
-
+//ai.
+//write log 2Darray function on coords[][].
 const logArray = (array: coords[][]) => {
   array.forEach((segment, index) => {
     console.log(`Segment ${index}:`);
@@ -292,7 +294,8 @@ const logArray = (array: coords[][]) => {
     });
   });
 };
-
+//ai.
+//write a function that will sort array in arrays according to first x. 
 function sortAndMergeCoords(groups: coords[][]): coords[][] {
     // Filter out undefined or empty groups first
     const validGroups = groups.filter(g => Array.isArray(g) && g.length > 0);
@@ -326,67 +329,3 @@ function sortAndMergeCoords(groups: coords[][]): coords[][] {
     return result;
 }
 
-function angleBetween(a: coords, b: coords, c: coords): number {
-  const ab = { x: b.x - a.x, y: b.y - a.y };
-  const bc = { x: c.x - b.x, y: c.y - b.y };
-
-  const dot = ab.x * bc.x + ab.y * bc.y;
-  const magAB = Math.hypot(ab.x, ab.y);
-  const magBC = Math.hypot(bc.x, bc.y);
-
-  if (magAB === 0 || magBC === 0) return 0;
-
-  const cosTheta = dot / (magAB * magBC);
-  const clamped = Math.max(-1, Math.min(1, cosTheta)); // clamp to avoid floating point noise
-
-  const angleRad = Math.acos(clamped);
-  const angleDeg = (angleRad * 180) / Math.PI;
-
-  return angleDeg;
-}
-
-function computeHybridLikelihood(points: coords[]): number {
-  if (points.length < 3) return 0;
-
-  let totalAngle = 0;
-  let totalSlopeDelta = 0;
-  let count = 0;
-
-  for (let i = 0; i < points.length - 2; i++) {
-    const a = points[i], b = points[i + 1], c = points[i + 2];
-
-    // --- ANGLE ---
-    const angle = angleBetween(a, b, c);
-    const boostedAngle = Math.pow(angle / 180, 0.5); // sensitivity boost
-    if (!isNaN(boostedAngle) && isFinite(boostedAngle)) {
-      totalAngle += boostedAngle;
-    }
-
-    // --- SLOPE DELTA ---
-    const dx1 = b.x - a.x;
-    const dy1 = b.y - a.y;
-    const dx2 = c.x - b.x;
-    const dy2 = c.y - b.y;
-
-    if (dx1 === 0 || dx2 === 0) continue; // avoid divide by zero
-
-    const slope1 = dy1 / dx1;
-    const slope2 = dy2 / dx2;
-
-    const deltaSlope = Math.abs(slope2 - slope1);
-    if (!isNaN(deltaSlope) && isFinite(deltaSlope)) {
-      totalSlopeDelta += deltaSlope;
-    }
-
-    count++;
-  }
-
-  if (count === 0) return 0;
-
-  const avgAngle = totalAngle / count;
-  const avgDeltaSlope = totalSlopeDelta / count;
-
-  // Normalize: 0-1 range
-  const likelihood = Math.min(1, avgAngle + avgDeltaSlope / 10);
-  return Math.round(likelihood * 100);
-}
