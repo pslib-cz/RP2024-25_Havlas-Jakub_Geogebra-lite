@@ -6,222 +6,180 @@ import { coords, FunctionData } from "./types";
 type ViewBox = { x: number; y: number; width: number; height: number };
 
 const computeFullGraph = (expression: string[], viewBox: ViewBox,  color?: string) => {
-  let localStep = viewBox.width / 1000;
-  
+  let localStep = viewBox.width / 10000;
+
   let localLastY = 1000;
   let localPaths: coords[][] = [];
   let localPathArray: string[] = [];
   let localLock = true;
   let segmentIndex = 0;
+  let threshold = viewBox.width / 10000 * 30;
+  
   let recentPoints: coords[] = [];
  let counter = 0;
-  for (let i = viewBox.x; i < viewBox.width; i += localStep) {
+  for (let i = viewBox.x; i < (viewBox.width / 2) + localStep; i += localStep) {
     let x = i;
     
     let y = parseFloat(evaluator(expression, i));
-   
+  
     if (isNaN(y)) {localLock = true; continue;}
     /*
-    const point: coords = { x, y };
-    
-   
-    if ( counter % 100 == 0){
-      recentPoints.push(point);
-      counter = 0;
-    }else {
-      counter++;
-    }
-   
-   
-    // Keep only the latest 51 points (we need up to x-50)
-    if (recentPoints.length > 21) recentPoints.shift();
-    // SMART STEP BABY
-    if (
-      recentPoints.length >= 21 // ensure we have enough data
+    let ans = deltaY({x: x, y: y}, {x: x, y: localLastY})
+    if ( curvatureScore(recentPoints) < 0.1 && ans < 0.1) {
 
-    ) {
-      let a = computeHybridLikelihood(recentPoints);
-      if ( a ==  0 ){
-        a = 0.1;
-      } else if ( a == 1 ){
-        a = 0.5;
-      }
+      localStep = viewBox.width / 100;
+    }
+    if ( ans > threshold) {
       
-      localStep = localStep / a;
-      if (localStep > viewBox.width / 50) localStep = viewBox.width / 50;
-      console.log("Likelihood: ", localStep);
+     
+      localStep = viewBox.width / 100000;
+    }
+
+    recentPoints.push({ x, y });
+    if (recentPoints.length > 5) {
+      recentPoints.shift(); // remove the oldest point
     }
     */
-    
-    // Clamping based on viewBox
     if (y > -viewBox.y +1) continue
     if (y < viewBox.y - 1 ) continue;
     
     // Handling discontinuities
+
     if (Math.abs(localLastY) > -viewBox.y && Math.abs(y) > -viewBox.y && localLastY * y < 0) {
+      
+      localStep = viewBox.width / 10000;
       localLastY = 100;
       segmentIndex++;
       localLock = true;
-      continue;
-    } else {
+     
+     
+    } 
       localLastY = y;
-    }
+    
 
     if (localLock) {
       const point: coords = { x, y };
       if (!localPaths[segmentIndex]) localPaths[segmentIndex] = [];
       localPaths[segmentIndex][0] = point;
-      localPathArray[segmentIndex] = `M ${+x.toFixed(6)} ${+(-y).toFixed(6)} `;
+    
       localLock = false;
     } else {
       localPaths[segmentIndex].push({ x, y });
-      localPathArray[segmentIndex] += `L ${+x.toFixed(6)} ${+(-y).toFixed(6)} `;
+     
     }
   }
 
-  // Cache the result
+ 
   addFunction({
     color: `${color || "black"}`,
     expression,
     pathArray: localPaths,
   });
 
-  // Return rendered paths
+ 
   return localPathArray.map((d, index) => (
     <path key={index} d={d} stroke={color || "black"} fill="none" />
   ));
 };
 
 const computePartialGraph = (
+  
   expression: string[],
   viewBox: ViewBox,
   storedExpression: FunctionData,
   color?: string
 ) => {
-  // Only update the parts based on the viewBox
-  let localStep = viewBox.width / 1000;
+  
+  let localStep = viewBox.width / 10000;
   let localLastY = 1000;
   let localPaths: coords[][] = [];
   let localPathArray: string[] = [];
   let localLock = true;
   let segmentIndex = 0;
   
-  // Use some values from storedExpression to decide where to skip or teleport.
-  let fire: number | undefined;
-  let tp: number | undefined;
-  let threshold = 100;
+
+
+  let threshold = viewBox.width / 10000 * 30;
   const storedPaths = storedExpression.pathArray;
-  
-  if (storedPaths[0][0].x > viewBox.x) {
-    fire = storedPaths[0][0].x;
-    let lastSegment = storedPaths[0];
-    tp = lastSegment[lastSegment.length - 1].x;
-  }else {
-    //viewbox is smaller
-    // higher detail is needed
-  }
+
+
+
+
+ 
+    
   let recentPoints: coords[] = [];
-  // (Add any additional custom logic as needed.)
-  let storedsegmentIndex = 1;
-  let counter = 0;
-  for (let i = viewBox.x; i < viewBox.width / 2; i += localStep) {
+ 
+  let storedsegmentIndex = 0;
+  
+  for (let i = viewBox.x; i < viewBox.x + viewBox.width + localStep; i += localStep) {
     
   
-
-
-    if (
-      fire && fire < i && tp
-    ) {
-      i = tp
-      localLock = true;
-      segmentIndex++;
-      if ( storedPaths[storedsegmentIndex]) {
-        fire = storedPaths[storedsegmentIndex][0].x;
-        let lastSegment = storedPaths[storedsegmentIndex];
-        tp = lastSegment[lastSegment.length - 1].x;
-
-        storedsegmentIndex++;
-      }else {
-        fire = undefined;
-        tp = undefined;
-      }
-
+    if ( storedPaths[storedsegmentIndex] && storedPaths[storedsegmentIndex][0].x < i) {
+     console.log("fire ", storedsegmentIndex, storedPaths[storedsegmentIndex][0].x, i)
       
-    } 
+      i = storedPaths[storedsegmentIndex][storedPaths[storedsegmentIndex].length - 1].x;
+      localPaths[segmentIndex].push(...storedPaths[storedsegmentIndex]);
+      storedsegmentIndex++;
+    }
+
+
     let x = i;
+    
     let y = parseFloat(evaluator(expression, i));
     if (isNaN(y)) {localLock = true; continue;}
 /*
-    const point: coords = { x, y };
-    if ( counter % 100 == 0){
-      recentPoints.push(point);
-      counter = 0;
-    }else {
-      counter++;
+    let ans = deltaY({x: x, y: y}, {x: x, y: localLastY})
+    if ( curvatureScore(recentPoints) < 0.00001 && ans < 0.1) {
+      console.log("curvature fire ", curvatureScore(recentPoints)) 
+      localStep = viewBox.width / 100;
     }
-    
-    
-    // Keep only the latest 51 points (we need up to x-50)
-    if (recentPoints.length > 21) recentPoints.shift();
-    // SMART STEP BABY
-    if (
-      recentPoints.length >= 21 // ensure we have enough data
-
-    ) {
-      let a = computeHybridLikelihood(recentPoints);
-      if ( a ==  0 ){
-        a = 0.1;
-      } else if ( a == 1 ){
-        a = 0.5;
-      }
+    if ( ans > threshold) {
       
-      localStep = localStep / a;
-      if (localStep > viewBox.width / 50) localStep = viewBox.width / 50;
-      console.log("Likelihood: ", localStep);
+      console.log("threshhold overwrite ")
+      localStep = viewBox.width / 100000;
+    }
+
+    recentPoints.push({ x, y });
+    if (recentPoints.length > 5) {
+      recentPoints.shift(); // remove the oldest point
     }
     */
-   
-    /*
-    if (Math.abs(y - localLastY) > threshold) {
-      
-      y = y > localLastY ? viewBox.height : -viewBox.height;
-    }
-      */
     if (y > -viewBox.y + 5) continue
     if (y < viewBox.y - 5) continue;
 
     if (Math.abs(localLastY) > -viewBox.y && Math.abs(y) > -viewBox.y && localLastY * y < 0) {
+      localStep = viewBox.width / 10000;
       localLastY = viewBox.height;
       segmentIndex++;
       localLock = true;
-      continue;
-    } else {
+      
+    } 
       localLastY = y;
-    }
+    
 
     if (localLock) {
       const point: coords = { x, y };
       
       if (!localPaths[segmentIndex]) localPaths[segmentIndex] = [];
       localPaths[segmentIndex][0] = point;
-      localPathArray[segmentIndex] = `M ${+x.toFixed(6)} ${+(-y).toFixed(6)} `;
+     
       localLock = false;
     } else {
       
       localPaths[segmentIndex].push({ x, y });
-      localPathArray[segmentIndex] += `L ${+x.toFixed(6)} ${+(-y).toFixed(6)} `;
+     
     }
   }
- 
+
   
-  const combinedPaths = [...localPaths.map(path => [...path]), ...storedPaths.map(path => [...path])];
+ 
 
 
-  const preparedToSaveData = sortAndMergeCoords(combinedPaths);
+  
 
   const updatedExpression: FunctionData = {
     ...storedExpression,
-    pathArray: preparedToSaveData,
+    pathArray: localPaths,
   };
 
   const mergedPaths = pathsToDStrings(updatedExpression.pathArray);
@@ -257,8 +215,7 @@ const General = ({
   
 
 
-  // Render whichever graph is appropriate. For instance,
-  // if we have a storedExpression and viewBox has changed, show the combined graph.
+
   return (
     <>
       {graph}
@@ -297,35 +254,109 @@ const logArray = (array: coords[][]) => {
 //ai.
 //write a function that will sort array in arrays according to first x. 
 function sortAndMergeCoords(groups: coords[][]): coords[][] {
-    // Filter out undefined or empty groups first
-    const validGroups = groups.filter(g => Array.isArray(g) && g.length > 0);
+  const validGroups = groups.filter(g => Array.isArray(g) && g.length > 0);
+  const sorted = [...validGroups].sort((a, b) => a[0].x - b[0].x);
+  const result: coords[][] = [];
 
-    // Step 1: Sort groups by the first x
-    const sorted = [...validGroups].sort((a, b) => a[0].x - b[0].x);
+  const X_GAP_THRESHOLD = 0.01; // You can adjust this based on your resolution
 
-    // Step 2: Merge groups where appropriate
-    const result: coords[][] = [];
-
-    for (const group of sorted) {
-        const firstY = group[0].y;
-
-        if (result.length === 0) {
-            result.push(group);
-            continue;
-        }
-
-        const lastGroup = result[result.length - 1];
-        const lastY = lastGroup[lastGroup.length - 1].y;
-
-        const isAsymptote = lastY * firstY < 0;
-
-        if (isAsymptote) {
-            result.push(group); // keep separate
-        } else {
-            result[result.length - 1] = lastGroup.concat(group); // merge
-        }
+  for (const group of sorted) {
+    if (result.length === 0) {
+      result.push(group);
+      continue;
     }
 
-    return result;
+    const lastGroup = result[result.length - 1];
+    const lastPoint = lastGroup[lastGroup.length - 1];
+    const firstPoint = group[0];
+
+    const xGap = firstPoint.x - lastPoint.x;
+    const ySignChanged = lastPoint.y * firstPoint.y < 0;
+
+    const isGapTooBig = xGap > X_GAP_THRESHOLD;
+
+    if (isGapTooBig || ySignChanged) {
+      result.push(group);
+    } else {
+      // Safe to merge
+      result[result.length - 1] = lastGroup.concat(group);
+    }
+  }
+
+  return result;
 }
 
+function deltaY(coord1: coords, coord2: coords): number {
+let y1 = Math.abs(coord1.y);
+let y2 = Math.abs(coord2.y);
+  return y1 - y2;
+}
+
+
+
+
+
+function curvatureScore(coords: coords[], sensitivity = 2): number {
+  if (coords.length < 3) {
+      return 0;
+  }
+
+  const angleBetween = (a: coords, b: coords, c: coords): number => {
+      const ab = [b.x - a.x, b.y - a.y];
+      const bc = [c.x - b.x, c.y - b.y];
+
+      const dot = ab[0] * bc[0] + ab[1] * bc[1];
+      const magAB = Math.sqrt(ab[0]**2 + ab[1]**2);
+      const magBC = Math.sqrt(bc[0]**2 + bc[1]**2);
+
+      if (magAB === 0 || magBC === 0) return 0;
+
+      const cosTheta = dot / (magAB * magBC);
+      const clamped = Math.max(-1, Math.min(1, cosTheta));
+
+      return Math.acos(clamped); // in radians
+  };
+
+  let totalAngle = 0;
+  let count = 0;
+
+  for (let i = 0; i < coords.length - 2; i++) {
+      const angle = angleBetween(coords[i], coords[i+1], coords[i+2]);
+      totalAngle += angle;
+      count++;
+  }
+
+  const avgAngle = count > 0 ? totalAngle / count : 0;
+
+  // Normalize to 0–1 (π is max possible)
+  let normalized = avgAngle / Math.PI;
+
+  // Make it more sensitive: exaggerate small changes using a nonlinear boost
+  normalized = Math.pow(normalized, 1 / sensitivity); // e.g., sqrt for sensitivity = 2
+
+  return parseFloat(normalized.toFixed(6));
+}
+const findLastPointInMatchingRow = (
+  coords: { x: number; y: number }[][],
+  viewBoxX: number,
+  localStep: number
+): { x: number; y: number } | null => {
+  for (let m = 0; m < coords.length; m++) {
+    const row = coords[m];
+
+    if (!row || row.length === 0) continue; // <-- skip empty or undefined rows
+
+    for (let n = 0; n < row.length; n++) {
+      const point = row[n];
+      if (
+        point &&
+        point.x >= viewBoxX - localStep &&
+        point.x < viewBoxX
+      ) {
+        return row[row.length - 1]; // safe now
+      }
+    }
+  }
+
+  return null;
+};
