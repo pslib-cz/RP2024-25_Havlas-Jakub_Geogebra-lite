@@ -5,7 +5,7 @@ import  generateGrid  from "./utils/generateGrid";
 import { ViewBox } from "./types"; 
 import useDebounce from "./CustomHooks/useDebounce";
 // Define the ViewBox type
-import {  getFunctionDataByExpression, replaceFunction, addFunction, flushFunctionData } from './SessionStorage';
+
 import { FunctionData, reqs } from './types';
 import Picker from "./Picker";
 let LibraryController = ({
@@ -15,41 +15,43 @@ let LibraryController = ({
     reqs: reqs[];
     params: { x: number; y: number; width: number; height: number };
   }) => {
-    //const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(null);
+    const [reqsData, setReqsData] = useState<reqs[]>(reqs);
 
-    const [viewBox, setViewBox] = useState({
-      x: params.x,
-      y: params.y,
-      width: params.width,
-      height: params.height,
-    });
-    const [debouncedViewBox, setDebouncedViewBox] = useState(viewBox);
-    useDebounce(() => {
-      setDebouncedViewBox(viewBox);
-    }, 300, [viewBox]);
+useEffect(() => {
+  setReqsData(reqs);
+}, [reqs]);
+   
+ //data normalization
+  
     let expressions: FunctionData[] = [];
-   for (let i = 0; i < reqs.length; i++) {
-      let expression = parseExpression(reqs[i].expression);
-      let color = reqs[i].color;
+    for (let i = 0; i < reqsData.length; i++) {
+     
+      const req = reqsData[i];
+      if (!req || !req.expression) continue;
+    
+      const expression = parseExpression(req.expression);
+      const color = req.color;
+    
       expressions[i] = {
         id: i,
-        color: color,
-        expression: expression,
+        color,
+        expression,
         pathArray: [],
-      }
+      };
     }
  
 
-
-
-
-    
-
-   
-    
-     
-    
-  
+//rest
+   const [viewBox, setViewBox] = useState({
+    x: params.x,
+    y: params.y,
+    width: params.width,
+    height: params.height,
+  });
+  const [debouncedViewBox, setDebouncedViewBox] = useState(viewBox);
+  useDebounce(() => {
+    setDebouncedViewBox(viewBox);
+  }, 300, [viewBox]);
     const svgRef = useRef<SVGSVGElement | null>(null);
 
 
@@ -61,25 +63,32 @@ let LibraryController = ({
       startPoint.current = { x: e.clientX, y: e.clientY };
     };
     const handleMouseMove = (e: React.MouseEvent) => {
-      // if (svgRef.current) {
-      //   const svgRect = svgRef.current.getBoundingClientRect();
-    
-      //   const svgX = viewBox.x + (e.clientX - svgRect.left) * (viewBox.width / svgRect.width);
-      //   const svgY = viewBox.y + (e.clientY - svgRect.top) * (viewBox.height / svgRect.height);
-    
-      //   setMousePos({ x: svgX, y: svgY });
-      // }
       if (!isPanning.current || !svgRef.current) return;
-  
+    
       const dx = (e.clientX - startPoint.current.x) * (viewBox.width / svgRef.current.clientWidth);
       const dy = (e.clientY - startPoint.current.y) * (viewBox.height / svgRef.current.clientHeight);
-  
-      setViewBox((prev) => ({
-        ...prev,
-        x: prev.x - dx,
-        y: prev.y - dy,
-      }));
-  
+    
+      setViewBox((prev) => {
+        let newX = prev.x - dx;
+        let newY = prev.y - dy;
+    
+        // Clamp the values between -200 and 200
+        const maxX = 200;
+        const minX = -200;
+        const maxY = 200;
+        const minY = -200;
+    
+        // Prevent panning beyond the range
+        newX = Math.max(minX, Math.min(maxX - prev.width, newX));
+        newY = Math.max(minY, Math.min(maxY - prev.height, newY));
+    
+        return {
+          ...prev,
+          x: newX,
+          y: newY,
+        };
+      });
+    
       startPoint.current = { x: e.clientX, y: e.clientY };
     };
     const endPan = () => {
@@ -98,7 +107,7 @@ let LibraryController = ({
   
         const newWidth = prev.width * zoomFactor;
         const newHeight = prev.height * zoomFactor;
-        if (newWidth > 10000 || newHeight < 0.001) {
+        if (newWidth > 400 || newHeight < 0.001) {
           return prev; // Prevent zooming out too much
         }
         return {

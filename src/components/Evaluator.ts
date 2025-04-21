@@ -11,6 +11,8 @@ export const evaluator = (expression: string[], x: number) => {
 
 let foundParen = true;
 
+//ai
+// Could you make the code handle brackets and absolute brackets as well? use recursion for this.
 while (foundParen) {
   foundParen = false;
   let i = 0;
@@ -39,6 +41,8 @@ while (foundParen) {
     i++;
   }
 }
+
+
 let foundAbs = true;
 
 while (foundAbs) {
@@ -89,6 +93,9 @@ while (foundAbs) {
       }
     }
   
+
+    //ai
+    // How does math evamluators work?
     for (const { symbol, fn } of OPERATORS) {
       for (let i = expression.length - 1; i >= 0; i--) {
         if (expression[i] === symbol) {

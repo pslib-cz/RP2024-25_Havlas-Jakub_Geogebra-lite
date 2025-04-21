@@ -21,7 +21,7 @@ const computeFullGraph = (expression: string[], viewBox: ViewBox,  color?: strin
     let x = i;
     
     let y = parseFloat(evaluator(expression, i));
-
+   
     if (isNaN(y)) {localLock = true; continue;}
     /*
     let ans = deltaY({x: x, y: y}, {x: x, y: localLastY})
@@ -49,7 +49,7 @@ const computeFullGraph = (expression: string[], viewBox: ViewBox,  color?: strin
       
       localStep = viewBox.width / 10000;
       localLastY = 100;
-      segmentIndex++;
+      
       localLock = true;
      
      
@@ -58,6 +58,7 @@ const computeFullGraph = (expression: string[], viewBox: ViewBox,  color?: strin
     
 
     if (localLock) {
+      segmentIndex++;
       const point: coords = { x, y };
       if (!localPaths[segmentIndex]) localPaths[segmentIndex] = [];
       localPaths[segmentIndex][0] = point;
@@ -89,7 +90,7 @@ const computePartialGraph = (
   color?: string
 ) => {
   
-  let localStep = viewBox.width / 10000;
+  let localStep = viewBox.width / 20000;
   let localLastY = 1000;
   let localPaths: coords[][] = [];
   let localPathArray: string[] = [];
@@ -122,38 +123,41 @@ const computePartialGraph = (
         localPaths[segmentIndex] = [];
       }
       localPaths[segmentIndex].push(...storedPaths[storedsegmentIndex]);
+      localLock = false;
       storedsegmentIndex++;
     }
-
+    
 
     let x = i;
     
     let y = parseFloat(evaluator(expression, i));
+    
     if (isNaN(y)) {localLock = true; continue;}
-/*
+
     let ans = deltaY({x: x, y: y}, {x: x, y: localLastY})
+    /*
     if ( curvatureScore(recentPoints) < 0.00001 && ans < 0.1) {
-      console.log("curvature fire ", curvatureScore(recentPoints)) 
+
       localStep = viewBox.width / 100;
-    }
+    }*/
     if ( ans > threshold) {
       
-      console.log("threshhold overwrite ")
-      localStep = viewBox.width / 100000;
+  
+      localStep = viewBox.width / 3000000;
     }
 
     recentPoints.push({ x, y });
     if (recentPoints.length > 5) {
       recentPoints.shift(); // remove the oldest point
     }
-    */
+    
     if (y > -viewBox.y + 5) continue
     if (y < viewBox.y - 5) continue;
 
     if (Math.abs(localLastY) > -viewBox.y && Math.abs(y) > -viewBox.y && localLastY * y < 0) {
       localStep = viewBox.width / 10000;
       localLastY = viewBox.height;
-      segmentIndex++;
+      
       localLock = true;
       
     } 
@@ -161,6 +165,7 @@ const computePartialGraph = (
     
 
     if (localLock) {
+      segmentIndex++;
       const point: coords = { x, y };
       
       if (!localPaths[segmentIndex]) localPaths[segmentIndex] = [];
