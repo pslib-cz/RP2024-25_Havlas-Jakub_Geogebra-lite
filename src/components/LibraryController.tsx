@@ -7,6 +7,7 @@ import useDebounce from "./CustomHooks/useDebounce";
 // Define the ViewBox type
 import {  getFunctionDataByExpression, replaceFunction, addFunction, flushFunctionData } from './SessionStorage';
 import { FunctionData, reqs } from './types';
+import Picker from "./Picker";
 let LibraryController = ({
     reqs,
     params,
@@ -26,22 +27,18 @@ let LibraryController = ({
     useDebounce(() => {
       setDebouncedViewBox(viewBox);
     }, 300, [viewBox]);
-    let data: React.ReactElement[] = [];
-   
-  for (let i = 0; i < reqs.length; i++) {
-    let expression = parseExpression(reqs[i].expression);
-    
-    let storedExpression: FunctionData | undefined = getFunctionDataByExpression(expression);
-    if (storedExpression) {
-      
-      data[i] = <General  key={i}  expression={expression} viewBox={debouncedViewBox} storedExpression={storedExpression} color={reqs[i].color}/>;
-     
-    }else {
-      data[i] =<General  key={i}  expression={expression} viewBox={debouncedViewBox}  color={reqs[i].color}/>;
-     
+    let expressions: FunctionData[] = [];
+   for (let i = 0; i < reqs.length; i++) {
+      let expression = parseExpression(reqs[i].expression);
+      let color = reqs[i].color;
+      expressions[i] = {
+        id: i,
+        color: color,
+        expression: expression,
+        pathArray: [],
+      }
     }
-   
-  }
+ 
 
 
 
@@ -164,7 +161,7 @@ let LibraryController = ({
         />
  <g fill="none" stroke="black" strokeWidth={strokeWidth}>
   
- {viewBox === debouncedViewBox ? data : null}
+ {viewBox === debouncedViewBox ? <Picker expressions={expressions} params={viewBox} /> : null}
  </g>
         
         

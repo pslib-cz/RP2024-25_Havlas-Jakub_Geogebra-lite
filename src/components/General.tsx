@@ -10,7 +10,7 @@ const computeFullGraph = (expression: string[], viewBox: ViewBox,  color?: strin
 
   let localLastY = 1000;
   let localPaths: coords[][] = [];
-  let localPathArray: string[] = [];
+  
   let localLock = true;
   let segmentIndex = 0;
   let threshold = viewBox.width / 10000 * 30;
@@ -21,7 +21,7 @@ const computeFullGraph = (expression: string[], viewBox: ViewBox,  color?: strin
     let x = i;
     
     let y = parseFloat(evaluator(expression, i));
-  
+
     if (isNaN(y)) {localLock = true; continue;}
     /*
     let ans = deltaY({x: x, y: y}, {x: x, y: localLastY})
@@ -75,9 +75,8 @@ const computeFullGraph = (expression: string[], viewBox: ViewBox,  color?: strin
     expression,
     pathArray: localPaths,
   });
-
- 
-  return localPathArray.map((d, index) => (
+  const mergedPaths = pathsToDStrings(localPaths);
+  return mergedPaths.map((d, index) => (
     <path key={index} d={d} stroke={color || "black"} fill="none" />
   ));
 };
@@ -110,14 +109,18 @@ const computePartialGraph = (
   let recentPoints: coords[] = [];
  
   let storedsegmentIndex = 0;
-  
+
   for (let i = viewBox.x; i < viewBox.x + viewBox.width + localStep; i += localStep) {
     
   
     if ( storedPaths[storedsegmentIndex] && storedPaths[storedsegmentIndex][0].x < i) {
+
      console.log("fire ", storedsegmentIndex, storedPaths[storedsegmentIndex][0].x, i)
       
       i = storedPaths[storedsegmentIndex][storedPaths[storedsegmentIndex].length - 1].x;
+      if (!localPaths[segmentIndex]) {
+        localPaths[segmentIndex] = [];
+      }
       localPaths[segmentIndex].push(...storedPaths[storedsegmentIndex]);
       storedsegmentIndex++;
     }

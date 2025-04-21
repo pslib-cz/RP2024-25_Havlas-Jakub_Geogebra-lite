@@ -4,11 +4,19 @@ const STORAGE_KEY = 'functionsKey';
 let appData: { functions: FunctionData[] } = { functions: [] };
 let idcounter = -1;
 
+// write me some functions that would manipulate with the appData object. The functions should be able to add, remove, replace. [DunctionDataType]
 
-export const getFunctionDataByExpression = (expression: string[]): FunctionData | undefined => {
-    
-    return appData.functions.find(func => func.expression.some(expr => expression.includes(expr)));
-  };
+export const getFunctionDataByExpression = (expression?: string[]): FunctionData | undefined => {
+  // Early return if expression is not valid
+  if (!expression || !Array.isArray(expression) || expression.length === 0) {
+    console.warn("Invalid expression provided to getFunctionDataByExpression");
+    return undefined;
+  }
+
+  return appData.functions.find(func =>
+    func.expression.some(expr => expression.includes(expr))
+  );
+};
 
   export const replaceFunction = (newFunc: FunctionData, id: number): void => {
     
