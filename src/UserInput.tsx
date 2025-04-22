@@ -1,6 +1,10 @@
+
+//ai
+// write me basic input system, that would allow user to enter multiple functions. The input system should be able to handle multiple inputs, and it should be able to handle special characters like sin, cos, tan, ^, √, π, e. The input system should also be able to handle Ctrl+Z for undo.
 import React, { useState, useRef, useEffect } from "react";
 import { reqs } from "./components/types";
-
+import "./App.css"; // Assuming you have some CSS for styling
+import  "./UserInput.css"; // Assuming you have some CSS for styling
 interface UserInputProps {
   onSubmitExpressions: (functions: reqs[]) => void;
 }
@@ -101,13 +105,14 @@ const UserInput: React.FC<UserInputProps> = ({ onSubmitExpressions }) => {
     }
   }, []);
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="form-section form-container">
       {functions.map((fn, index) => (
-        <div key={index} style={{ marginBottom: "1rem" }}>
-          <label>
-            Function {index + 1}:
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+        <div key={index}  className="input-item">
+          <label className="label-field">
+           
+            <div  className="input-container">
               <input
+              className="input-field"
                 type="text"
                 value={fn.expression}
                 onChange={(e) => handleExpressionChange(index, e.target.value)}
@@ -121,6 +126,7 @@ const UserInput: React.FC<UserInputProps> = ({ onSubmitExpressions }) => {
                 }}
               />
               <input
+               className="input-color-field"
                 type="color"
                 value={fn.color}
                 onChange={(e) => handleColorChange(index, e.target.value)}
