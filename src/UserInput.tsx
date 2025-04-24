@@ -74,20 +74,27 @@ const UserInput: React.FC<UserInputProps> = ({ onSubmitExpressions }) => {
   };
 
   const insertSpecialChar = (char: string) => {
+    
     if (lastFocusedIndex === null) return;
     const input = inputRefs.current[lastFocusedIndex];
     if (!input) return;
-
+    if (char.length > 1) {
+      char = char + "()"; // Add opening parenthesis for functions
+    }
+    
     const start = input.selectionStart ?? 0;
     const end = input.selectionEnd ?? 0;
     const value = functions[lastFocusedIndex].expression;
-
+    let posans = start + char.length;
+    if (char.length > 1) {
+      posans = start + char.length - 1;
+    }
     const newValue = value.slice(0, start) + char + value.slice(end);
     updateExpression(lastFocusedIndex, newValue);
 
     setTimeout(() => {
       input.focus();
-      const pos = start + char.length;
+      const pos = posans;
       input.setSelectionRange(pos, pos);
     }, 0);
   };
