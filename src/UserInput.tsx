@@ -9,7 +9,9 @@ interface UserInputProps {
 }
 
 const UserInput: React.FC<UserInputProps> = ({ onSubmitExpressions }) => {
-  const [functions, setFunctions] = useState<reqs[]>([{ expression: "", color: "#000000" }]);
+  const [functions, setFunctions] = useState<reqs[]>([
+    { expression: "", color: "#000000" },
+  ]);
   const [lastFocusedIndex, setLastFocusedIndex] = useState<number | null>(null);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const historyRefs = useRef<string[][]>([[""]]);
@@ -17,22 +19,25 @@ const UserInput: React.FC<UserInputProps> = ({ onSubmitExpressions }) => {
   const maxHistory = 20;
 
   const specialButtons = ["sin", "cos", "tan", "^", "√", "π", "e", "(", ")"];
-  /*
+
   const [isMobile, setIsMobile] = useState(false);
   const [isOpen, setIsOpen] = useState(true);
 
   useEffect(() => {
     const checkScreen = () => {
-      setIsMobile(window.innerWidth < 768);
-      setIsOpen(window.innerWidth < 768) // Tailwind's md breakpoint
-     
+      if (window.innerWidth < 768) {
+        setIsMobile(true);
+        setIsOpen(false);
+      } else {
+        setIsMobile(false);
+        setIsOpen(true);
+      }
     };
-    checkScreen(); // initial check
+    checkScreen();
     window.addEventListener("resize", checkScreen);
     return () => window.removeEventListener("resize", checkScreen);
   }, []);
-*/
- 
+
   const config = { loader: { load: ["input/tex", "output/chtml"] } };
 
   useEffect(() => {
@@ -54,7 +59,7 @@ const UserInput: React.FC<UserInputProps> = ({ onSubmitExpressions }) => {
   }, [lastFocusedIndex]);
 
   const convertFractions = (expr: string) => {
-    const tokens = expr.split(/([\s+\-*/()])/).filter(t => t.trim() !== '');
+    const tokens = expr.split(/([\s+\-*/()])/).filter((t) => t.trim() !== "");
     for (let i = 0; i < tokens.length; i++) {
       if (tokens[i] === "/") {
         const left = tokens[i - 1];
@@ -65,10 +70,14 @@ const UserInput: React.FC<UserInputProps> = ({ onSubmitExpressions }) => {
         }
       }
     }
-    return tokens.join('');
+    return tokens.join("");
   };
 
-  const updateExpression = (index: number, value: string, pushToHistory = true) => {
+  const updateExpression = (
+    index: number,
+    value: string,
+    pushToHistory = true
+  ) => {
     const updated = [...functions];
     updated[index].expression = value;
     setFunctions(updated);
@@ -80,7 +89,11 @@ const UserInput: React.FC<UserInputProps> = ({ onSubmitExpressions }) => {
       historyRefs.current[index] = history;
     }
 
-    if (value.trim() !== "" && index === functions.length - 1 && functions.length < maxFunctions) {
+    if (
+      value.trim() !== "" &&
+      index === functions.length - 1 &&
+      functions.length < maxFunctions
+    ) {
       setFunctions([...updated, { expression: "", color: "#000000" }]);
       historyRefs.current.push([""]);
     }
@@ -121,7 +134,9 @@ const UserInput: React.FC<UserInputProps> = ({ onSubmitExpressions }) => {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    const validFunctions = functions.filter((fn) => fn.expression.trim() !== "");
+    const validFunctions = functions.filter(
+      (fn) => fn.expression.trim() !== ""
+    );
     onSubmitExpressions(validFunctions);
   };
 
@@ -136,72 +151,96 @@ const UserInput: React.FC<UserInputProps> = ({ onSubmitExpressions }) => {
   //if (!isMobile) return null; // Don't render anything on desktop
   return (
     <div>
-        <button
-        //onClick={() => setIsOpen(true)}
-        className="p-2 bg-blue-600 text-white rounded"
-      >
-        Open Overlay
-      </button>
-      {//isOpen &&
-        (
-      <MathJaxContext version={3} config={config}> {/* ⭐ NEW: MathJax Context */}
-        <form onSubmit={handleSubmit} className="form-section form-container">
-          {functions.map((fn, index) => (
-            <div key={index} className="input-item">
-              <label className="label-field">
-                <div className="input-container">
-                  <input
-                    className="input-field"
-                    type="text"
-                    value={fn.expression}
-                    onChange={(e) => handleExpressionChange(index, e.target.value)}
-                    onFocus={() => setLastFocusedIndex(index)}
-                    placeholder="Enter a mathematical function"
-                    ref={(el) => {
-                      inputRefs.current[index] = el;
-                      if (!historyRefs.current[index]) {
-                        historyRefs.current[index] = [fn.expression];
-                      }
-                    }}
-                  />
-                  <input
-                    className="input-color-field"
-                    type="color"
-                    value={fn.color}
-                    onChange={(e) => handleColorChange(index, e.target.value)}
-                  />
-                </div>
+      {!isOpen && isMobile && (
+        <button onClick={() => setIsOpen(true)} className="OpenOverlayButton">
+          Open Overlay
+        </button>
+      )}
+      {isOpen && (
+        <div>
+          <MathJaxContext version={3} config={config}>
+            <form
+              onSubmit={handleSubmit}
+              className="form-section form-container"
+            >
+              {isMobile && (
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="p-2 bg-blue-600 text-white rounded"
+                >
+                  close
+                </button>
+              )}
 
-                {/* ⭐ NEW: Render converted LaTeX preview */}
-                <div style={{ marginTop: "0.5rem", fontSize: "1.2rem" }}>
-                  <MathJax dynamic>
-                    {`\\(${convertFractions(fn.expression)}\\)`}
-                  </MathJax>
-                </div>
-              </label>
-            </div>
-          ))}
+              {functions.map((fn, index) => (
+                <div key={index} className="input-item">
+                  <label className="label-field">
+                    <div className="input-container">
+                      <input
+                        className="input-field"
+                        type="text"
+                        value={fn.expression}
+                        onChange={(e) =>
+                          handleExpressionChange(index, e.target.value)
+                        }
+                        onFocus={() => setLastFocusedIndex(index)}
+                        placeholder="Enter a mathematical function"
+                        ref={(el) => {
+                          inputRefs.current[index] = el;
+                          if (!historyRefs.current[index]) {
+                            historyRefs.current[index] = [fn.expression];
+                          }
+                        }}
+                      />
+                      <input
+                        className="input-color-field"
+                        type="color"
+                        value={fn.color}
+                        onChange={(e) =>
+                          handleColorChange(index, e.target.value)
+                        }
+                      />
+                    </div>
 
-          {/* Special Buttons */}
-          <div style={{ margin: "1rem 0", display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-            {specialButtons.map((char) => (
-              <button
-                type="button"
-                key={char}
-                onClick={() => insertSpecialChar(char)}
-                style={{ padding: "4px 8px", fontSize: "0.9rem" }}
+                    {/* ⭐ NEW: Render converted LaTeX preview */}
+                    <div style={{ marginTop: "0.5rem", fontSize: "1.2rem" }}>
+                      <MathJax dynamic>
+                        {`\\(${convertFractions(fn.expression)}\\)`}
+                      </MathJax>
+                    </div>
+                  </label>
+                </div>
+              ))}
+
+              {/* Special Buttons */}
+              <div
+                style={{
+                  margin: "1rem 0",
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "0.5rem",
+                }}
               >
-                {char}
-              </button>
-            ))}
-          </div>
+                {specialButtons.map((char) => (
+                  <button
+                    type="button"
+                    key={char}
+                    onClick={() => insertSpecialChar(char)}
+                    style={{ padding: "4px 8px", fontSize: "0.9rem" }}
+                  >
+                    {char}
+                  </button>
+                ))}
+              </div>
 
-          {functions.length === maxFunctions && (
-            <p>You have reached the maximum number of functions.</p>
-          )}
-          <button type="submit">Submit</button>
-        </form>
-      </MathJaxContext>)}
+              {functions.length === maxFunctions && (
+                <p>You have reached the maximum number of functions.</p>
+              )}
+              <button type="submit">Submit</button>
+            </form>
+          </MathJaxContext>
+        </div>
+      )}
     </div>
   );
 };

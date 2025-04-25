@@ -1,15 +1,11 @@
-
-html, body, #root {
+html,
+body,
+#root {
   width: 100%;
-
 }
-
-
 
 .container {
   width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 300px;
   height: 100vh;
 }
 
@@ -19,17 +15,33 @@ html, body, #root {
   height: 100vh;
 }
 
-.form-section {
-  box-sizing: border-box;
-  max-width: 300px;
+.form-container {
+  position: fixed;
+  bottom: -100%; /* Start hidden offscreen */
+  left: 0; /* Start hidden offscreen */
   width: 100%;
- 
-  background-color: #ffffff;
- 
-  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 2rem;
+  transition: bottom 0.3s ease; /* Smooth transition */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
 }
 
+.form-container--open {
+  bottom: 100%;
+}
 
+.form-section--open {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  background-color: #ffffff;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+}
 
 .svg-overlay {
   position: absolute;
@@ -44,10 +56,9 @@ html, body, #root {
   z-index: 10;
 }
 
-
 .mouse-coords {
   position: absolute;
- top: 1em;
+  top: 1em;
   left: 1em;
   background: rgba(0, 0, 0, 0.7);
   color: white;
@@ -59,28 +70,30 @@ html, body, #root {
 }
 
 @media (min-width: 1024px) {
- 
-.form-section {
-  box-sizing: border-box;
-  max-width: 300px;
-  width: 100%;
- 
-  background-color: #ffffff;
- 
-  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-}
-.container {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 300px;
-  height: 100vh;
-}
+  .form-section {
+    box-sizing: border-box;
+    max-width: 300px;
+    width: 100%;
 
-.svg-section {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-}
+    background-color: #ffffff;
 
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+  }
+  .form-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .container {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    height: 100vh;
+  }
 
+  .svg-section {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+  }
 }
