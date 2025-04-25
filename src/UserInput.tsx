@@ -25,7 +25,7 @@ const UserInput: React.FC<UserInputProps> = ({ onSubmitExpressions }) => {
 
   useEffect(() => {
     const checkScreen = () => {
-      if (window.innerWidth < 768) {
+      if (window.innerWidth < 1024) {
         setIsMobile(true);
         setIsOpen(false);
       } else {
@@ -148,7 +148,7 @@ const UserInput: React.FC<UserInputProps> = ({ onSubmitExpressions }) => {
     }
   }, []);
 
-  //if (!isMobile) return null; // Don't render anything on desktop
+
   return (
     <div>
       {!isOpen && isMobile && (
@@ -161,7 +161,7 @@ const UserInput: React.FC<UserInputProps> = ({ onSubmitExpressions }) => {
           <MathJaxContext version={3} config={config}>
             <form
               onSubmit={handleSubmit}
-              className="form-section form-container"
+              className={"form-section form-container " + (isMobile ? "form-container--open" : "")}
             >
               {isMobile && (
                 <button
@@ -171,7 +171,7 @@ const UserInput: React.FC<UserInputProps> = ({ onSubmitExpressions }) => {
                   close
                 </button>
               )}
-
+            <div className="input-section scroll-container">
               {functions.map((fn, index) => (
                 <div key={index} className="input-item">
                   <label className="label-field">
@@ -211,7 +211,7 @@ const UserInput: React.FC<UserInputProps> = ({ onSubmitExpressions }) => {
                   </label>
                 </div>
               ))}
-
+</div>
               {/* Special Buttons */}
               <div
                 style={{

@@ -31,5 +31,6 @@
 .OpenOverlayButton {
   position: absolute;
   bottom: 0;
-  left: calc(50% - 140px / 2);
+  left: 50%;
+  transform: translate(-50%, 0);
 }
