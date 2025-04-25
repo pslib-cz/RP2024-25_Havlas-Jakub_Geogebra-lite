@@ -1,3 +1,6 @@
+
+//toto je napsané přes ai
+// write me a custome react hook useDebound use ts. 
 import { useEffect } from "react";
 import useTimeout from "./useTimeout"; // adjust path as needed
 

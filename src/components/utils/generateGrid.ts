@@ -1,3 +1,7 @@
+
+
+//ai
+// Could you me a function that would take a viewBox object and generate a grid of lines for a graph? The function should return auxiliary lines and their labels. 
 interface ViewBox {
     x: number;
     y: number;

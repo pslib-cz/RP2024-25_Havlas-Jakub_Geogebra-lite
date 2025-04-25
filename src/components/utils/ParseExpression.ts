@@ -1,4 +1,7 @@
 
+
+//ai 
+//Could you make me a function that would take a string expression and parse it into an array of tokens? The function should handle numbers, operators and funtions. It should also handle implicit multiplication (e.g., "2x" should be parsed as "2*x"). The function should return an array of strings representing the tokens. For example, the input "3 + 4 * (2 - 1)" should return ["3", "+", "4", "*", "(", "2", "-", "1", ")"].
 export const parseExpression = (expression: string) => {
   const cleanedExpr = expression.replace(/\s+/g, "");
 

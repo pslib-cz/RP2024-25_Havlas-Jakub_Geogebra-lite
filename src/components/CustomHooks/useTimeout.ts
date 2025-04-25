@@ -1,3 +1,6 @@
+
+//toto je napsané přes ai
+// viz useDebounce.tsx
 import { useCallback, useEffect, useRef } from "react";
 
 export default function useTimeout(callback: () => void, delay: number) {
