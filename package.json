@@ -1,4 +1,5 @@
 {
+  "homepage": "https://JakubHavlas.github.io/RP2024-25_Havlas-Jakub_Geogebra-lite",
   "name": "geogebralite",
   "private": true,
   "version": "0.0.0",
@@ -7,10 +8,13 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist -b production",
+     "predeploy": "npm run build"
   },
   "dependencies": {
     "better-react-mathjax": "^2.3.0",
+    "gh-pages": "^6.3.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

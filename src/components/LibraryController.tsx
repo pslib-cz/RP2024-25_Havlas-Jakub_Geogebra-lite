@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import General from "./General";
+
 import  { parseExpression }  from "./utils/ParseExpression"
 import  generateGrid  from "./utils/generateGrid";
 import { ViewBox } from "./types"; 
@@ -76,6 +76,7 @@ useEffect(() => {
     const lastTouchDistance = useRef<number | null>(null);
     const isTouchPanning = useRef(false);
     const lastTouchCenter = useRef<{ x: number; y: number } | null>(null);
+    /*
     const getTouchPoint = (touch: Touch, element: SVGSVGElement) => {
       const rect = element.getBoundingClientRect();
       return {
@@ -83,7 +84,7 @@ useEffect(() => {
         y: ((touch.clientY - rect.top) / rect.height) * viewBox.height + viewBox.y,
       };
     };
-    
+    */
     const getDistance = (touch1: Touch, touch2: Touch) => {
       return Math.sqrt(
         Math.pow(touch2.clientX - touch1.clientX, 2) +

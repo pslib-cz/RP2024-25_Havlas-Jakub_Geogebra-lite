@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import General from "./General";
 
 import { ViewBox } from "./types"; 
 
 // Define the ViewBox type
-import {  getFunctionDataByExpression, replaceFunction, addFunction, flushFunctionData } from './SessionStorage';
+import {  getFunctionDataByExpression} from './SessionStorage';
 import { FunctionData } from './types';
 let Picker = ({
     expressions,
