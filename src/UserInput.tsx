@@ -21,13 +21,13 @@ const UserInput: React.FC<UserInputProps> = ({ onSubmitExpressions }) => {
   const specialButtons = ["sin", "cos", "tan", "^", "√", "π", "e", "(", ")"];
 
   const [isMobile, setIsMobile] = useState(false);
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const checkScreen = () => {
       if (window.innerWidth < 1024) {
         setIsMobile(true);
-        setIsOpen(false);
+        //setIsOpen(false);
       } else {
         setIsMobile(false);
         setIsOpen(true);
