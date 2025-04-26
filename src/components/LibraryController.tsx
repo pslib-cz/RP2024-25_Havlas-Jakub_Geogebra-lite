@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import General from "./General";
 import  { parseExpression }  from "./utils/ParseExpression"
 import  generateGrid  from "./utils/generateGrid";
@@ -24,23 +24,17 @@ useEffect(() => {
    
  //data normalization
   
-    let expressions: FunctionData[] = [];
-    for (let i = 0; i < reqsData.length; i++) {
-     
-      const req = reqsData[i];
-      if (!req || !req.expression) continue;
-    
-      const expression = parseExpression(req.expression);
-      const color = req.color;
-    
-      expressions[i] = {
-        id: i,
-        color,
-        expression,
-        pathArray: [],
-      };
-    }
- 
+ const expressions = useMemo(() => {
+  return reqsData.map((req, i) => {
+    if (!req || !req.expression) return null;
+    return {
+      id: i,
+      color: req.color,
+      expression: parseExpression(req.expression),
+      pathArray: [],
+    };
+  }).filter(Boolean) as FunctionData[];
+}, [reqsData]);
 
 
 
@@ -63,10 +57,10 @@ useEffect(() => {
       });
     }, []);
     
-    // ✅ Debounced update on resize
+  
     useDebounce(updateViewBox, 200, [updateViewBox]);
     
-    // ✅ Immediate update on first mount
+
     useEffect(() => {
       updateViewBox(); // ← call it once right away
       window.addEventListener("resize", updateViewBox);
@@ -163,7 +157,8 @@ useEffect(() => {
       lastTouchDistance.current = null;
       lastTouchCenter.current = null;
     };
-    const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(null);
+    const mousePosRef = useRef<{ x: number; y: number } | null>(null);
+    const [, forceUpdate] = useState(0);
    const [viewBox, setViewBox] = useState({
     x: params.x,
     y: params.y,
@@ -190,7 +185,8 @@ useEffect(() => {
       const rect = svgRef.current.getBoundingClientRect();
       const svgX = ((e.clientX - rect.left) / rect.width) * viewBox.width + viewBox.x;
       const svgY = ((e.clientY - rect.top) / rect.height) * viewBox.height + viewBox.y;
-      setMousePos({ x: svgX, y: svgY });
+      mousePosRef.current = { x: svgX, y: svgY };
+      forceUpdate(v => v + 1); // forces a trivial rerender for the small overlay
     
       if (!isPanning.current) return;
     
@@ -201,10 +197,10 @@ useEffect(() => {
         let newX = prev.x - dx;
         let newY = prev.y - dy;
     
-        const maxX = 200;
-        const minX = -200;
-        const maxY = 200;
-        const minY = -200;
+        const maxX = 170;
+        const minX = -170;
+        const maxY = 170;
+        const minY = -170;
     
         newX = Math.max(minX, Math.min(maxX - prev.width, newX));
         newY = Math.max(minY, Math.min(maxY - prev.height, newY));
@@ -220,7 +216,7 @@ useEffect(() => {
     };
     const endPan = () => {
       isPanning.current = false;
-      setMousePos(null); // ← clear mouse position
+      mousePosRef.current = null;
     };
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
@@ -234,7 +230,7 @@ useEffect(() => {
   
         const newWidth = prev.width * zoomFactor;
         const newHeight = prev.height * zoomFactor;
-        if (newWidth > 400 || newHeight < 0.001) {
+        if (newWidth > 200 || newHeight < 0.001) {
           return prev; // Prevent zooming out too much
         }
         return {
@@ -330,9 +326,9 @@ useEffect(() => {
       <span>Calculating...</span>
     </div>
   )}
-  {mousePos && (
+ {mousePosRef.current && (
   <div className="mouse-coords">
-    x: {mousePos.x.toFixed(2)}, y: {mousePos.y.toFixed(2)}
+    x: {mousePosRef.current.x.toFixed(2)}, y: {mousePosRef.current.y.toFixed(2)}
   </div>
 )}
       </div>

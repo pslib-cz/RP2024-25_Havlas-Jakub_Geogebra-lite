@@ -23,8 +23,9 @@ const computeFullGraph = (expression: string[], viewBox: ViewBox,  color?: strin
     let y = parseFloat(evaluator(expression, i));
    
     if (isNaN(y)) {localLock = true; continue;}
-    /*
+    
     let ans = deltaY({x: x, y: y}, {x: x, y: localLastY})
+    /*
     if ( curvatureScore(recentPoints) < 0.1 && ans < 0.1) {
 
       localStep = viewBox.width / 100;
@@ -40,6 +41,11 @@ const computeFullGraph = (expression: string[], viewBox: ViewBox,  color?: strin
       recentPoints.shift(); // remove the oldest point
     }
     */
+    if ( ans > threshold) {
+      
+  
+      localStep = viewBox.width / 2000000;
+    }
     if (y > -viewBox.y +1) continue
     if (y < viewBox.y - 1 ) continue;
     
