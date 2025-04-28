@@ -5,6 +5,8 @@ import  generateGrid  from "../utils/generateGrid";
 import { ViewBox } from "../types"; 
 import useDebounce from "../CustomHooks/useDebounce";
 import "../../App.css";
+import "./LibraryController.css";
+import "../Library.css";
 // Define the ViewBox type
 
 import { FunctionData, reqs } from '../types';
@@ -12,9 +14,11 @@ import Picker from "../Picker/Picker";
 let LibraryController = ({
     reqs,
     params,
+    moveable,
   }: {
     reqs: reqs[];
     params: { x: number; y: number; width: number; height: number };
+    moveable: boolean;
   }) => {
     const [reqsData, setReqsData] = useState<reqs[]>(reqs);
 
@@ -282,51 +286,51 @@ useEffect(() => {
             height={viewBox.height}
             fill="white"
           />
-  <g fill="none" stroke="black" strokeWidth={strokeWidth}>
-    
-  <g fill="none" stroke="black" strokeWidth={strokeWidth}>
-      {viewBox === debouncedViewBox ? (
-        <Picker expressions={expressions} params={viewBox} />
-      ) : null}
-    </g>
-  </g>
-          
-          
-          <g stroke="lightgray" strokeWidth={strokeWidth}>
-            {grid.vertical.map((x) => (
-              <line key={`v-${x}`} x1={x} y1={viewBox.y} x2={x} y2={viewBox.y + viewBox.height} />
-            ))}
-            {grid.horizontal.map((y) => (
-              <line key={`h-${y}`} y1={y} x1={viewBox.x} y2={y} x2={viewBox.x + viewBox.width} />
-            ))}
-          </g>
-        
-        
-          <line x1={viewBox.x} y1={0} x2={viewBox.x + viewBox.width} y2={0} stroke="black"  strokeWidth={strokeWidth}/>
-          <line x1={0} y1={viewBox.y} x2={0} y2={viewBox.y + viewBox.height} stroke="black" strokeWidth={strokeWidth}/>
         
           
-          <g fontFamily="Arial" fontSize={0.5 * (viewBox.width / 30)} fill="black" textAnchor="middle">
-            {grid.labels.map((label, i) => (
-              <text key={`label-${i}`} x={label.x} y={label.y}   style={{ pointerEvents: "none", userSelect: "none" }}>
-                {label.text}
-              </text>
-            ))}
-          </g>
-         
-        </svg>
-        {viewBox !== debouncedViewBox && (
-    <div className="svg-overlay">
-      <span>Calculating...</span>
-    </div>
-  )}
- {mousePosRef.current && (
-  <div className="mouse-coords">
-    x: {mousePosRef.current.x.toFixed(2)}, y: {mousePosRef.current.y.toFixed(2)}
-  </div>
-)}
-      </div>
-    );
-  };
+                <g fill="none"   stroke="black" strokeWidth={strokeWidth}>
+                    {viewBox === debouncedViewBox ? (
+                      <Picker expressions={expressions} params={viewBox} />
+                    ) : null}
+                  </g>
+                
+                
+                
+                <g className="helpingLines"  strokeWidth={strokeWidth}>
+                  {grid.vertical.map((x) => (
+                    <line key={`v-${x}`} x1={x} y1={viewBox.y} x2={x} y2={viewBox.y + viewBox.height} />
+                  ))}
+                  {grid.horizontal.map((y) => (
+                    <line key={`h-${y}`} y1={y} x1={viewBox.x} y2={y} x2={viewBox.x + viewBox.width} />
+                  ))}
+                </g>
+              
+              <g className="axes"  strokeWidth={strokeWidth}>
+                <line x1={viewBox.x} y1={0} x2={viewBox.x + viewBox.width} y2={0}  strokeWidth={strokeWidth}/>
+                <line x1={0} y1={viewBox.y} x2={0} y2={viewBox.y + viewBox.height}strokeWidth={strokeWidth}/>
+              </g>
+                
+                <g className="axis-labels"  fontSize={0.5 * (viewBox.width / 30)} textAnchor="middle">
+                  {grid.labels.map((label, i) => (
+                    <text key={`label-${i}`} x={label.x} y={label.y}   style={{ pointerEvents: "none", userSelect: "none" }}>
+                      {label.text}
+                    </text>
+                  ))}
+                </g>
+              
+              </svg>
+              {viewBox !== debouncedViewBox && (
+          <div className="svg-overlay">
+            <span>Calculating...</span>
+          </div>
+        )}
+      {mousePosRef.current && (
+        <div className="mouse-coords">
+          x: {mousePosRef.current.x.toFixed(2)}, y: {mousePosRef.current.y.toFixed(2)}
+        </div>
+      )}
+            </div>
+          );
+        };
 
-  export default LibraryController;
+        export default LibraryController;

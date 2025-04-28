@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import  { useState } from "react";
 import LibraryController from "./components/LibraryController/LibraryController";
 import "./App.css";
 import UserInput from "./components/UserInput/UserInput";
@@ -11,8 +11,13 @@ function App() {
 
   return (
     <div className="container">
-      <LibraryController reqs={expressions} params={defaultParams} />
-      <UserInput onSubmitExpressions={setExpressions} />
+      <div >
+      <LibraryController reqs={expressions} params={defaultParams} moveable={true}/>
+      </div>
+        <div>
+        <UserInput onSubmitExpressions={setExpressions} />
+        </div>
+      
     </div>
   );
 }
