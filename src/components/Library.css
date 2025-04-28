@@ -1,0 +1,46 @@
+
+:root {
+    --background-color: #e2e2e2;
+    --text-color: #121212;
+    --font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+    --line-height: 1.5;
+    --font-weight: 400;
+    --color-scheme: light dark;
+    --color: rgba(0, 0, 0, 0.87); 
+    --font-synthesis: none;
+    --text-rendering: optimizeLegibility;
+    --webkit-font-smoothing: antialiased;
+    --moz-osx-font-smoothing: grayscale;
+    --hover-color: #1d24af;
+    --input-background-color: #b9b9b9;
+    
+    font-family: var(--font-family);
+    line-height: var(--line-height);
+    font-weight: var(--font-weight);
+    color: var(--color);
+    background-color: var(--background-color-light);
+    color-scheme: var(--color-scheme);
+    font-synthesis: var(--font-synthesis);
+    text-rendering: var(--text-rendering);
+    -webkit-font-smoothing: var(--webkit-font-smoothing);
+    -moz-osx-font-smoothing: var(--moz-osx-font-smoothing);
+
+
+    --graph-background-color: #f0f0f0;
+    --graph-text-color: #000000;
+    --graph-axes-color: #000000;
+    --graph-HelpLines-color: #d0d0d0;
+}
+.body{
+    margin: 0;
+}
+@media (prefers-color-scheme: dark) {
+    :root {
+        --input-background-color: #414141;
+        --background-color: #242424;
+        --text-color: #e2e2e2;
+        --color: rgba(255, 255, 255, 0.87); 
+        background-color: var(--background-color-dark);
+        color: var(--text-color-dark);
+    }
+}

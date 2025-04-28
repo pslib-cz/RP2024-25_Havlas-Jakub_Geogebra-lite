@@ -1,0 +1,15 @@
+.library-svg {
+    background-color: var(--background-color);
+}
+.helpingLines {
+    stroke: var(--graph-HelpLines-color);
+}
+.axes {
+    stroke: var(--graph-axes-color);
+}
+.axis-labels {
+    fill: var(--graph-text-color);
+    font-family: var(--font-family);
+  
+}
+
