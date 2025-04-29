@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import LibraryController from "./components/LibraryController";
 import "./App.css";
 import UserInput from "./UserInput";
-
+import { GraphLibrary } from 'graph-lib';
 import { reqs } from "./components/types";
 
 function App() {
@@ -14,9 +14,10 @@ function App() {
     <div className="container">
       
     
-        <LibraryController
+        <GraphLibrary
           reqs={expressions}
           params={defaultParams}
+          moveable={true}
         />
      <UserInput onSubmitExpressions={setExpressions} />
     </div>
