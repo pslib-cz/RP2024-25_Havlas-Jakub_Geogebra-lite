@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MathJax, MathJaxContext } from "better-react-mathjax"; // ⭐ NEW
 import { reqs } from "../components/types";
-import "../../App.css";
+import "../App.css";
 import "./UserInput.css";
 import { validateAndCleanExpression } from "../components/utils/validateExpression"; // Adjust the import path as necessary
 import convertFractions from "../components/utils/ConvertToMathJax"; // Adjust the import path as necessary

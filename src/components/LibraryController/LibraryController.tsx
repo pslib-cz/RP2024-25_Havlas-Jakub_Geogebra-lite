@@ -244,11 +244,18 @@ useEffect(() => {
       const svg = svgRef.current;
   
       if (!svg) return;
-  
-      svg.addEventListener("wheel", handleWheel, { passive: false });
-      svg.addEventListener("touchstart", handleTouchStart, { passive: false });
-      svg.addEventListener("touchmove", handleTouchMove, { passive: false });
-      svg.addEventListener("touchend", handleTouchEnd);
+      if (moveable) {
+        svg.addEventListener("wheel", handleWheel, { passive: false });
+        svg.addEventListener("touchstart", handleTouchStart, { passive: false });
+        svg.addEventListener("touchmove", handleTouchMove, { passive: false });
+        svg.addEventListener("touchend", handleTouchEnd);
+      } else {
+        svg.removeEventListener("wheel", handleWheel);
+        svg.removeEventListener("touchstart", handleTouchStart);
+        svg.removeEventListener("touchmove", handleTouchMove);
+        svg.removeEventListener("touchend", handleTouchEnd);
+      }
+     
       return () => {
         svg.removeEventListener("wheel", handleWheel);
         svg.removeEventListener("touchstart", handleTouchStart);

@@ -12,7 +12,7 @@ function App() {
   return (
     <div className="container">
       <div >
-      <LibraryController reqs={expressions} params={defaultParams} moveable={true}/>
+      <LibraryController reqs={expressions} params={defaultParams} moveable={false}/>
       </div>
         <div>
         <UserInput onSubmitExpressions={setExpressions} />

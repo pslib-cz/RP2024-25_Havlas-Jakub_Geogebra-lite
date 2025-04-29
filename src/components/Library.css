@@ -34,6 +34,7 @@
 
 @media (prefers-color-scheme: dark) {
     :root {
+        --graph-HelpLines-color: #504d4d;
         --input-background-color: #414141;
         --background-color: #242424;
         --text-color: #e2e2e2;
