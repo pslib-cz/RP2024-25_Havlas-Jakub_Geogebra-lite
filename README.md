@@ -21,3 +21,9 @@ y= a^(bx) + c
 y = alog10(bx) + c | x > 0 && b > 0
 
 y = ax^n + bx^n(n-1)... + d
+
+
+
+GOT PUBLISHED
+@jakub-havlas/graph-lib
+https://github.com/JakubHavlas/graph-lib
