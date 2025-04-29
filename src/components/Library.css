@@ -31,16 +31,16 @@
     --graph-axes-color: #000000;
     --graph-HelpLines-color: #d0d0d0;
 }
-.body{
-    margin: 0;
-}
+
 @media (prefers-color-scheme: dark) {
     :root {
         --input-background-color: #414141;
         --background-color: #242424;
         --text-color: #e2e2e2;
         --color: rgba(255, 255, 255, 0.87); 
-        background-color: var(--background-color-dark);
-        color: var(--text-color-dark);
+        --graph-axes-color: #ffffff;
+        --graph-text-color: #ffffff;
+        background-color: var(--background-color);
+        color: var(--text-color);
     }
 }

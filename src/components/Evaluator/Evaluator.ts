@@ -142,43 +142,11 @@ while (foundAbs) {
     { symbol: "goldenRatioConjugate", value: (Math.sqrt(5) - 1) / 2 },
   ];
   
-  const brackets = [
-    { symbol: ["(", ")"], fn: (a: number) => a },
-    { symbol: ["|", "|"], fn: (a: number) => Math.abs(a) },
-  ];
 
+/*
   const variables = [
     { symbol: "x", value: 0 },
     { symbol: "y", value: 0 },
     { symbol: "z", value: 0 },
   ];
-
-  const insertImplicitMultiplication = (tokens: string[]): string[] => {
-    const result: string[] = [];
-  
-    for (let i = 0; i < tokens.length; i++) {
-      result.push(tokens[i]);
-  
-      const curr = tokens[i];
-      const next = tokens[i + 1];
-  
-      if (!next) continue;
-  
-      const isNumber = (s: string) => !isNaN(parseFloat(s));
-      const isVariableOrFunc = (s: string) =>
-        s === "x" || constants.some(c => c.symbol === s) || functions.some(f => f.symbol === s);
-  
-      const isOpenBracket = next === "(" || next === "|";
-  
-      // If current token is a number, variable, constant or closing bracket
-      // and next is a variable, function, or opening bracket => insert *
-      if (
-        (isNumber(curr) || curr === "x" || curr === ")" || curr === "|" || constants.some(c => c.symbol === curr)) &&
-        (isVariableOrFunc(next) || isOpenBracket)
-      ) {
-        result.push("*");
-      }
-    }
-  
-    return result;
-  };
+*/

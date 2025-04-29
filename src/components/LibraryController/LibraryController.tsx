@@ -284,7 +284,7 @@ useEffect(() => {
             y={viewBox.y}
             width={viewBox.width}
             height={viewBox.height}
-            fill="white"
+           
           />
         
           

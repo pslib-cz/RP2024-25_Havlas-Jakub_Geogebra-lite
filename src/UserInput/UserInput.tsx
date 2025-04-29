@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MathJax, MathJaxContext } from "better-react-mathjax"; // ⭐ NEW
-import { reqs } from "../types";
+import { reqs } from "../components/types";
 import "../../App.css";
 import "./UserInput.css";
-import { validateAndCleanExpression } from "../utils/validateExpression"; // Adjust the import path as necessary
-import convertFractions from "../utils/ConvertToMathJax"; // Adjust the import path as necessary
+import { validateAndCleanExpression } from "../components/utils/validateExpression"; // Adjust the import path as necessary
+import convertFractions from "../components/utils/ConvertToMathJax"; // Adjust the import path as necessary
 interface UserInputProps {
   onSubmitExpressions: (functions: reqs[]) => void;
 }

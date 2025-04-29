@@ -1,7 +1,7 @@
 import  { useState } from "react";
 import LibraryController from "./components/LibraryController/LibraryController";
 import "./App.css";
-import UserInput from "./components/UserInput/UserInput";
+import UserInput from "./UserInput/UserInput";
 
 import { reqs } from "./components/types";
 
