@@ -1,16 +1,16 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MathJax, MathJaxContext } from "better-react-mathjax"; // ⭐ NEW
-import { reqs } from "../components/types";
+
 import "../App.css";
 import "./UserInput.css";
-import { validateAndCleanExpression } from "../components/utils/validateExpression"; // Adjust the import path as necessary
-import convertFractions from "../components/utils/ConvertToMathJax"; // Adjust the import path as necessary
+import { validateAndCleanExpression } from "./validateExpression"; // Adjust the import path as necessary
+import { Req} from "../types/types"; // Adjust the import path as necessary
 interface UserInputProps {
-  onSubmitExpressions: (functions: reqs[]) => void;
+  onSubmitExpressions: (functions: Req[]) => void;
 }
 
 const UserInput: React.FC<UserInputProps> = ({ onSubmitExpressions }) => {
-  const [functions, setFunctions] = useState<reqs[]>([
+  const [functions, setFunctions] = useState<Req[]>([
     { expression: "", color: "#000000" },
   ]);
   const [lastFocusedIndex, setLastFocusedIndex] = useState<number | null>(null);
