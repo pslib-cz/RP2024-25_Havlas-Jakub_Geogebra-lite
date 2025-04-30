@@ -1,12 +1,12 @@
 import  { useState } from "react";
 
 import "./App.css";
-import UserInput from "./UserInput";
+import UserInput from "./components/UserInput";
 import { GraphLibrary } from "@jakub-havlas/graph-lib";
-
+import { Req } from "./types/types"; // Adjust the import path as necessary
 
 function App() {
-  type Req = { expression: string; color: string };
+
   const [expressions, setExpressions] = useState<Req[]>([]);
   const defaultParams = { x: -2, y: -2, width: 4, height: 4 };
 

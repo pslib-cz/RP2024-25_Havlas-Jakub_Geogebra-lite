@@ -5,6 +5,7 @@ import "../App.css";
 import "./UserInput.css";
 import { validateAndCleanExpression } from "./validateExpression"; // Adjust the import path as necessary
 import { Req} from "../types/types"; // Adjust the import path as necessary
+import convertFractions from "./ConvertToMathJax"; // Adjust the import path as necessary
 interface UserInputProps {
   onSubmitExpressions: (functions: Req[]) => void;
 }
