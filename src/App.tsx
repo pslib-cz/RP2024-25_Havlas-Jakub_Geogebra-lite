@@ -1,17 +1,18 @@
 import  { useState } from "react";
-import LibraryController from "./components/LibraryController";
+
 import "./App.css";
 import UserInput from "./UserInput";
+import { GraphLibrary } from "@jakub-havlas/graph-lib";
 
-import { reqs } from "./components/types";
 
 function App() {
-  const [expressions, setExpressions] = useState<reqs[]>([]);
+  type Req = { expression: string; color: string };
+  const [expressions, setExpressions] = useState<Req[]>([]);
   const defaultParams = { x: -2, y: -2, width: 4, height: 4 };
 
   return (
     <div className="container">
-      <LibraryController reqs={expressions} params={defaultParams} />
+      <GraphLibrary reqs={expressions} params={defaultParams} moveable={true} />
       <UserInput onSubmitExpressions={setExpressions} />
     </div>
   );

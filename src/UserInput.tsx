@@ -1,15 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MathJax, MathJaxContext } from "better-react-mathjax"; // ⭐ NEW
-import { reqs } from "./components/types";
+
 import "./App.css";
 import "./UserInput.css";
 
 interface UserInputProps {
-  onSubmitExpressions: (functions: reqs[]) => void;
+  onSubmitExpressions: (functions: Req[]) => void;
 }
-
+type Req = { expression: string; color: string };
 const UserInput: React.FC<UserInputProps> = ({ onSubmitExpressions }) => {
-  const [functions, setFunctions] = useState<reqs[]>([
+  const [functions, setFunctions] = useState<Req[]>([
     { expression: "", color: "#000000" },
   ]);
   const [lastFocusedIndex, setLastFocusedIndex] = useState<number | null>(null);
