@@ -117,6 +117,9 @@ let LibraryController = ({
   };
 
   const handleTouchMove = (e: TouchEvent) => {
+    //doesn't use max min width and height for now
+    //whyyyyyyy
+
     if (!svgRef.current) return;
 
     if (e.touches.length === 1 && isTouchPanning.current) {
