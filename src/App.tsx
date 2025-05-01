@@ -17,6 +17,8 @@ function App() {
           params={defaultParams}
           moveable={true}
           maxWidth={300}
+          displayGrid={true}
+       
         />
       </div>
       <div>

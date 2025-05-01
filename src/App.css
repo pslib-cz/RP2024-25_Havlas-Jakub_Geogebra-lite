@@ -18,12 +18,7 @@ body,
 .scroll-container::-webkit-scrollbar {
   display: none;
 }
-.svg-section {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  box-sizing: border-box;
-}
+
 .input-section {
   margin-top: 2em;
   overflow-y: auto;
@@ -56,31 +51,9 @@ body,
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
 }
 
-.svg-overlay {
-  position: absolute;
-  inset: 0; /* shorthand for top: 0; right: 0; bottom: 0; left: 0 */
-  background-color: rgba(0, 0, 0, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5em;
-  color: white;
-  pointer-events: none;
-  z-index: 10;
-}
 
-.mouse-coords {
-  position: absolute;
-  top: 1em;
-  left: 1em;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  font-size: 0.9em;
-  padding: 4px 8px;
-  border-radius: 6px;
-  pointer-events: none;
-  z-index: 20;
-}
+
+
 
 @media (min-width: 1024px) {
   .form-section {
@@ -104,9 +77,5 @@ body,
     height: 100vh;
   }
 
-  .svg-section {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-  }
+
 }

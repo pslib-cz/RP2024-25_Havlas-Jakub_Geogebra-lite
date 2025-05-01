@@ -23,12 +23,16 @@ let LibraryController = ({
   moveable = true,
   minWidth = 0.001,
   maxWidth = 200,
+  displayCoords = true,
+  displayGrid = true,
 }: {
   reqs: reqs[];
   params?: ViewBox;
   moveable?: boolean;
   minWidth?: number;
   maxWidth?: number;
+  displayCoords?: boolean;
+  displayGrid?: boolean;
 }) => {
   const [reqsData, setReqsData] = useState<reqs[]>(reqs);
 
@@ -310,7 +314,8 @@ let LibraryController = ({
           width={viewBox.width}
           height={viewBox.height}
         />
-
+    {displayGrid && (
+      <g>
         <g className="helpingLines" strokeWidth={strokeWidth}>
           {grid.vertical.map((x) => (
             <line
@@ -331,7 +336,6 @@ let LibraryController = ({
             />
           ))}
         </g>
-
         <g className="axes" strokeWidth={strokeWidth}>
           <line
             x1={viewBox.x}
@@ -348,7 +352,6 @@ let LibraryController = ({
             strokeWidth={strokeWidth}
           />
         </g>
-
         <g
           className="axis-labels"
           fontSize={0.5 * (viewBox.width / 30)}
@@ -365,6 +368,13 @@ let LibraryController = ({
             </text>
           ))}
         </g>
+      </g>
+    )}
+       
+
+       
+
+     
 
         <g fill="none" stroke="black" strokeWidth={strokeWidth * 3}>
           {viewBox === debouncedViewBox ? (
@@ -377,7 +387,7 @@ let LibraryController = ({
           <span>Calculating...</span>
         </div>
       )}
-      {mousePosRef.current && (
+      {mousePosRef.current && displayCoords && (
         <div className="mouse-coords">
           x: {mousePosRef.current.x.toFixed(2)}, y:{" "}
           {mousePosRef.current.y.toFixed(2)}
