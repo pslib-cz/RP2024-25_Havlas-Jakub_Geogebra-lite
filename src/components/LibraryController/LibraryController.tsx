@@ -13,6 +13,8 @@ import useDebounce from "../CustomHooks/useDebounce";
 import "../../App.css";
 import "./LibraryController.css";
 import "../Library.css";
+import ProcessInput from "../utils/ProcessInput";
+import {newParseExpression} from "../utils/NewParseExpression";
 // Define the ViewBox type
 
 import { FunctionData, reqs } from "../types";
@@ -35,9 +37,31 @@ let LibraryController = ({
   displayGrid?: boolean;
 }) => {
   const [reqsData, setReqsData] = useState<reqs[]>(reqs);
-
+ 
   useEffect(() => {
-    setReqsData(reqs);
+    let ans: FunctionData[] = [];
+    newParseExpression("a = 222 + -3.14 * 40 + -5.5 / -63 + sin(2) + cos(3) + tan(4) + log(5) + ln(6) + sqrt(7) + abs(8)")
+    for (let i = 0; i < reqs.length; i++) {
+      const parsedExpr = parseExpression(reqs[i].expression);
+      console.log(parsedExpr);
+  
+      ans.push({
+        id: i,
+        expression: parsedExpr,
+        color: reqs[i].color,
+        pathArray: [],
+      });
+    }
+  
+    const processedData = ProcessInput(ans.map((item) => item.expression));
+    
+    const updatedReqsData = processedData.map((data, index) => ({
+      expression: data.join(" "), // Convert string[] to string
+      color: reqs[index]?.color || "#000",
+    }));
+  
+    setReqsData(updatedReqsData);
+    console.log("Processed Data: ", reqsData);
   }, [reqs]);
 
   //data normalization
