@@ -103,6 +103,10 @@ const UserInput: React.FC<UserInputProps> = ({ onSubmitExpressions }) => {
     if (lastFocusedIndex === null) return;
     const input = inputRefs.current[lastFocusedIndex];
     if (!input) return;
+    if (char === "√") {
+      char = "sqrt";
+
+    }
     if (char.length > 1) {
       char = char + "()";
     }
