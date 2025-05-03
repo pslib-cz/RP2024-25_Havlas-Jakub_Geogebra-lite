@@ -1,29 +1,31 @@
-const mathFunctions = [
-    "sin", "cos", "tan", "log", "ln", "sqrt", "abs", 
-  ];
+import  isParsableToNumber  from "./ParsableNumber";
+import {ValidFunctions} from "../types";
 
-export const newParseExpression = (expression: string) => {
+ const parseExpression = (expression: string) => {
     let spreaded: string[] = [];
     spreaded = expression.split("")
     
     const filteredArr = spreaded.filter(item => item !== ' ');
 
     //do functions
-    for (let i = 0; i < mathFunctions.length; i++) {
+    for (let i = 0; i < ValidFunctions.length; i++) {
         let curr = ""
         let counter = 0
         for (let j = 0; j < filteredArr.length; j++) {
 
-            if (filteredArr[j] === mathFunctions[i].charAt(counter)) {
+            if (filteredArr[j] === ValidFunctions[i].charAt(counter)) {
                 curr = curr + filteredArr[j]
                
                 counter++;
-                if (counter === mathFunctions[i].length) {
+                
+                if (counter === ValidFunctions[i].length) {
+                    
                     let joined = filteredArr.slice(j - counter+1, j+1).join("")
                     
                     filteredArr.splice(j - counter + 1, counter, joined)
+                     curr = ""
+                   counter = 0
                     
-                    break;
                 }
             }
 
@@ -65,23 +67,28 @@ export const newParseExpression = (expression: string) => {
         } 
     }
 
-    //2x
-    //xsin
-    //ax
-    //asin
-    //implicit multiplication will be here
+    const supportedCharacters = [   "sin", "cos", "tan", "log", "ln", "sqrt", "abs",  "x", "a", "π"  ]
 
-    //detekovat člen 
-    // mezi členy musí být operátor
+   
+    for (let i = filteredArr.length - 1; i >= 0; i--) {
+        if (supportedCharacters.includes(filteredArr[i]) || isParsableToNumber(filteredArr[i]) ) {
+           if (supportedCharacters.includes(filteredArr[i - 1]) || isParsableToNumber(filteredArr[i -1] ) || filteredArr[i - 1] == ")") {
+                filteredArr.splice(i, 0, "*")
+           }
+        } else if (filteredArr[i] == "(") {
+            if (isParsableToNumber(filteredArr[i -1] ) || filteredArr[i - 1] == ")" || filteredArr[i - 1] == "x" || filteredArr[i - 1] == "a") {
+                filteredArr.splice(i, 0, "*")
+           }
+
+        }
+    }
+
+
     
 
 
 
-    console.log("spreaded", filteredArr)
-
+ return filteredArr
 }
-
-function isParsableToNumber(str: string) {
-    return !isNaN(Number(str));
-  }
+export default parseExpression
 

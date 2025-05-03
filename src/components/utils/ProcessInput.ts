@@ -1,5 +1,38 @@
+import {  ValidConstants, ValidVariables } from "../types";
+import validateChars from "./ValidateChars";
+import validateSyntax from "./ValidateSyntax";
 
 let ProccessInput = (input: string[][]) => {
+
+
+    // validate chars
+    for (let i = 0; i < input.length; i++) {
+        if (!validateChars(input[i])) {
+            throw new Error(`Invalid character in input: ${input[i]}`);
+        }
+    }
+    // validateSyntax
+    for (let i = 0; i < input.length; i++) {
+        if (!validateSyntax(input[i])) {
+            throw new Error(`Invalid syntax in input: ${input[i]}`);
+        }
+    }
+    // validate assigments
+    for (let i = 0; i < input.length; i++) {
+        if (input[i].includes("=")) {
+            if (input[i].length !== 3) {
+                throw new Error(`Invalid assignment in input: ${input[i]}`);
+            }
+            if (!ValidVariables.includes(input[i][0])) {
+                throw new Error(`Invalid variable in assignment: ${input[i]}`);
+            }
+            if (!ValidConstants.includes(input[i][0]) && !ValidVariables.includes(input[i][0])) {
+                
+                throw new Error(`Invalid value in assignment: ${input[i]}`);
+            }
+        }
+    }
+
     let ans: string[][] = [];
     let variables: {var:string, value:string}[] = [];
     for (let i = 0; i < input.length; i++) {
@@ -12,7 +45,7 @@ let ProccessInput = (input: string[][]) => {
         }
     }
 
-    console.log("Variables: ", variables);
+ 
 
     for (let variable of variables) {
         for (let i = 0; i < ans.length; i++) {
@@ -26,7 +59,11 @@ let ProccessInput = (input: string[][]) => {
         }
        
     }
-    console.log("Ans: ", ans);
+   
     return ans;
 }
 export default ProccessInput;
+
+
+
+

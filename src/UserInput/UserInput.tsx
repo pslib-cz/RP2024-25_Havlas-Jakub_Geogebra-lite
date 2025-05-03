@@ -3,7 +3,7 @@ import { MathJax, MathJaxContext } from "better-react-mathjax"; // ⭐ NEW
 import { reqs } from "../components/types";
 import "../App.css";
 import "./UserInput.css";
-import { validateAndCleanExpression } from "../components/utils/validateExpression"; // Adjust the import path as necessary
+import  validateExpression  from "../components/utils/validateExpression"; // Adjust the import path as necessary
 import convertFractions from "../components/utils/ConvertToMathJax"; // Adjust the import path as necessary
 interface UserInputProps {
   onSubmitExpressions: (functions: reqs[]) => void;
@@ -19,7 +19,7 @@ const UserInput: React.FC<UserInputProps> = ({ onSubmitExpressions }) => {
   const maxFunctions = 10;
   const maxHistory = 20;
   const [invalidIndices, setInvalidIndices] = useState<number[]>([]);
-  const specialButtons = ["sin", "cos", "tan", "^", "√", "π", "e", "(", ")"];
+  const specialButtons = ["sin", "cos", "tan", "^", "√", "π", "e", "(", ")", "|"];
 
   const [isMobile, setIsMobile] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -137,7 +137,7 @@ const UserInput: React.FC<UserInputProps> = ({ onSubmitExpressions }) => {
     const newInvalidIndices: number[] = [];
   
     validFunctions.forEach((fn, index) => {
-      const result = validateAndCleanExpression(fn.expression);
+      const result = validateExpression(fn.expression);
       if (!result.valid) {
         newInvalidIndices.push(index);
       }

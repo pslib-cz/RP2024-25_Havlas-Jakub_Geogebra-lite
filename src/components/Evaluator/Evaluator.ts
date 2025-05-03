@@ -1,4 +1,5 @@
 export const evaluator = (expression: string[], x: number) => {
+  
   //expression = insertImplicitMultiplication(expression);
   expression = expression.map((item) => {
     if (item === "x") return x.toString();
@@ -129,24 +130,15 @@ while (foundAbs) {
     { symbol: "log", fn: (a: number) => Math.log10(a) },
     { symbol: "cotan", fn: (a: number) => 1/Math.tan(a) },
     { symbol: "sqrt", fn: (a: number) => Math.sqrt(a) },
+    { symbol: "abs", fn: (a: number) => Math.abs(a) },
+    { symbol: "exp", fn: (a: number) => Math.exp(a) },
+    { symbol: "ln", fn: (a: number) => Math.log(a) },
+    { symbol: "log2", fn: (a: number) => Math.log2(a) },
+    { symbol: "log10", fn: (a: number) => Math.log10(a) },
   ];
   const constants = [
-    { symbol: "pi", value: Math.PI },
+    { symbol: "π", value: Math.PI },
     { symbol: "e", value: Math.E },
-    { symbol: "phi", value: (1 + Math.sqrt(5)) / 2 },
-    { symbol: "tau", value: 2 * Math.PI },
-    { symbol: "gamma", value: 0.5772156649 },
-    { symbol: "catalan", value: 0.9159655941 },
-    { symbol: "apery", value: 1.2020569032 },
-    { symbol: "eulerMascheroni", value: 0.5772156649 },
-    { symbol: "goldenRatioConjugate", value: (Math.sqrt(5) - 1) / 2 },
   ];
   
 
-/*
-  const variables = [
-    { symbol: "x", value: 0 },
-    { symbol: "y", value: 0 },
-    { symbol: "z", value: 0 },
-  ];
-*/

@@ -6,7 +6,7 @@ import React, {
   useMemo,
 } from "react";
 
-import { parseExpression } from "../utils/ParseExpression";
+
 import generateGrid from "../utils/generateGrid";
 import { ViewBox } from "../types";
 import useDebounce from "../CustomHooks/useDebounce";
@@ -14,7 +14,7 @@ import "../../App.css";
 import "./LibraryController.css";
 import "../Library.css";
 import ProcessInput from "../utils/ProcessInput";
-import {newParseExpression} from "../utils/NewParseExpression";
+import parseExpression from "../utils/NewParseExpression";
 // Define the ViewBox type
 
 import { FunctionData, reqs } from "../types";
@@ -40,11 +40,13 @@ let LibraryController = ({
  
   useEffect(() => {
     let ans: FunctionData[] = [];
-    newParseExpression("a = 222 + -3.14 * 40 + -5.5 / -63 + sin(2) + cos(3) + tan(4) + log(5) + ln(6) + sqrt(7) + abs(8)")
+      
+   
+   
     for (let i = 0; i < reqs.length; i++) {
       const parsedExpr = parseExpression(reqs[i].expression);
-      console.log(parsedExpr);
-  
+      
+     
       ans.push({
         id: i,
         expression: parsedExpr,
@@ -61,7 +63,7 @@ let LibraryController = ({
     }));
   
     setReqsData(updatedReqsData);
-    console.log("Processed Data: ", reqsData);
+    
   }, [reqs]);
 
   //data normalization
