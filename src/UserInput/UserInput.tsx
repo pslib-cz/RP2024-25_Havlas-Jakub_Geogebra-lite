@@ -4,7 +4,7 @@ import { reqs } from "../components/types";
 import "../App.css";
 import "./UserInput.css";
 import  validateExpression  from "../components/utils/validateExpression"; // Adjust the import path as necessary
-import convertFractions from "../components/utils/ConvertToMathJax"; // Adjust the import path as necessary
+import convertFractions from "./ConvertToMathJax"; // Adjust the import path as necessary
 interface UserInputProps {
   onSubmitExpressions: (functions: reqs[]) => void;
 }

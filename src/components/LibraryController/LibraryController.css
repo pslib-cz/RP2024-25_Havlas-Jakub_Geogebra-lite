@@ -48,3 +48,27 @@
     pointer-events: none;
     z-index: 10;
   }
+  .download-button-container{
+    position: absolute;
+    top: 1em;
+    right: 1em;
+   
+  }
+ 
+
+
+
+  
+@media (min-width: 1024px) {
+  .download-button-container{
+    display: none;
+   
+  }
+
+  .svg-section:hover .download-button-container {
+    display: block;
+  }
+
+
+
+}
