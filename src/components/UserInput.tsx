@@ -3,7 +3,7 @@ import { MathJax, MathJaxContext } from "better-react-mathjax"; // ⭐ NEW
 import { Req } from "../types/types";
 import "../App.css";
 import "./UserInput.css";
-import { validateAndCleanExpression } from "./validateExpression"; // Adjust the import path as necessary
+import { validateExpression } from "@jakub-havlas/graph-lib";// Adjust the import path as necessary
 import convertFractions from "./ConvertToMathJax"; // Adjust the import path as necessary
 interface UserInputProps {
   onSubmitExpressions: (functions: Req[]) => void;
@@ -137,7 +137,7 @@ const UserInput: React.FC<UserInputProps> = ({ onSubmitExpressions }) => {
     const newInvalidIndices: number[] = [];
   
     validFunctions.forEach((fn, index) => {
-      const result = validateAndCleanExpression(fn.expression);
+      const result = validateExpression(fn.expression);
       if (!result.valid) {
         newInvalidIndices.push(index);
       }

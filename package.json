@@ -13,7 +13,7 @@
     "predeploy": "npm run build"
   },
   "dependencies": {
-    "@jakub-havlas/graph-lib": "^2.2.0",
+    "@jakub-havlas/graph-lib": "^3.2.1",
     "better-react-mathjax": "^2.3.0",
     "gh-pages": "^6.3.0",
     "react": "^19.0.0",
