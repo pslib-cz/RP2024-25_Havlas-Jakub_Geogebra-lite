@@ -1,1 +1,0 @@
-export type Req = { expression: string; color: string };
