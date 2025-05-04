@@ -8,7 +8,7 @@ import React, {
 
 
 import generateGrid from "../utils/generateGrid";
-import { ViewBox } from "../types";
+
 import useDebounce from "../CustomHooks/useDebounce";
 import "../../App.css";
 import "./LibraryController.css";
@@ -17,7 +17,7 @@ import ProcessInput from "../utils/ProcessInput";
 import parseExpression from "../utils/NewParseExpression";
 // Define the ViewBox type
 
-import { FunctionData, reqs } from "../types";
+import { FunctionData, reqs, ViewBox } from "../types";
 import Picker from "../Picker/Picker";
 import DownloadButton from "../DowlandButton/DowlandButton";
 let LibraryController = ({
