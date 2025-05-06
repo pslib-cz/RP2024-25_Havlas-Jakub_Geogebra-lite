@@ -36,7 +36,7 @@ let ProccessInput = (input: string[][]) => {
     let ans: string[][] = [];
     let variables: {var:string, value:string}[] = [];
     for (let i = 0; i < input.length; i++) {
-        console.log("Input: ", input[i],input[i].includes("=") );
+        
         if (input[i].includes("=")) {
             variables.push({var: input[i][0], value: input[i][2]});
             

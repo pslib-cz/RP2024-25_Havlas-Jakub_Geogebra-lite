@@ -43,7 +43,6 @@ while (foundParen) {
   }
 }
 
-
 let foundAbs = true;
 
 while (foundAbs) {
@@ -93,12 +92,13 @@ while (foundAbs) {
         }
       }
     }
-  
+
 
     //ai
     // How does math evamluators work?
     for (const { symbol, fn } of OPERATORS) {
-      for (let i = expression.length - 1; i >= 0; i--) {
+      
+      for (let i =  0; i < expression.length; i++) {
         if (expression[i] === symbol) {
           const left = parseFloat(expression[i - 1]);
           const right = parseFloat(expression[i + 1]);
@@ -106,15 +106,21 @@ while (foundAbs) {
           if (!isNaN(left) && !isNaN(right)) {
             const result = fn(left, right);
             expression[i - 1] = result.toString();
-            expression.splice(i, 2); // remove operator and right operand
+            expression.splice(i, 2); 
+            i = i-2; // Reset index to re-evaluate the expression
           }
         }
       }
     }
-  
+    
     return expression[0];
   };
 
+/*
+  const postfixOperators = [
+    { symbol: "!", fn: (a: number) => factorial(a) },
+  ];
+  */
   const OPERATORS = [
     { symbol: "^", fn: (a: number, b: number) => Math.pow(a, b) },
     { symbol: "*", fn: (a: number, b: number) => a * b },
@@ -141,4 +147,12 @@ while (foundAbs) {
     { symbol: "e", value: Math.E },
   ];
   
+/*
+let factorial: (n: number) => number = (n: number) => {
 
+    if (n < 0) return NaN; 
+   for (let i = 1; i <= n; i++) {
+        n = n * i;
+    }
+  
+}*/

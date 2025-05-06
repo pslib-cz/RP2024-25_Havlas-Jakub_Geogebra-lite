@@ -53,7 +53,7 @@ import {ValidFunctions} from "../types";
     }
 
     const StinkyDinky = [ "/", "*", "+", "^", "-"  ]
-    
+    console.log("filteredArr", filteredArr)
     for (let i = filteredArr.length - 1; i >= 0; i--) {
         if ( filteredArr[i] == "-" && (isParsableToNumber(filteredArr[i+1]) || filteredArr[i+1] == "x") && StinkyDinky.includes(filteredArr[i-1]) ) {
            
@@ -66,7 +66,7 @@ import {ValidFunctions} from "../types";
             
         } 
     }
-
+    console.log("filteredArr", filteredArr)
     const supportedCharacters = [   "sin", "cos", "tan", "log", "ln", "sqrt", "abs",  "x", "a", "π"  ]
 
    

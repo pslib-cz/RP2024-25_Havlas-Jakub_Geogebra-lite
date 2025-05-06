@@ -146,8 +146,7 @@ let LibraryController = ({
   };
 
   const handleTouchMove = (e: TouchEvent) => {
-    //doesn't use max min width and height for now
-    //whyyyyyyy
+    
 
     if (!svgRef.current) return;
 
@@ -158,12 +157,30 @@ let LibraryController = ({
       const dy =
         (e.touches[0].clientY - startPoint.current.y) *
         (viewBox.height / svgRef.current.clientHeight);
-
-      setViewBox((prev) => ({
-        ...prev,
-        x: prev.x - dx,
-        y: prev.y - dy,
-      }));
+      
+      setViewBox((prev) => {
+        if (!moveable) return prev;
+        let maxX = maxWidth / 2;
+        let minX = (maxWidth / 2) * -1;
+        
+        let aspectRatio = svgRef.current
+          ? svgRef.current.clientHeight / svgRef.current.clientWidth
+          : 1; 
+        let maxY = (maxWidth * aspectRatio) / 2;
+        let minY = (maxWidth * aspectRatio) / -2;
+       
+        let newX = prev.x - dx;
+        let newY = prev.y - dy;
+        console.log( newY, maxY - prev.height);
+        newX = Math.max(minX, Math.min(maxX - prev.width, newX));
+        newY = Math.max(minY, Math.min(maxY - prev.height, newY));
+        
+        return {
+          ...prev,
+          x: newX,
+          y: newY,
+        };
+      });
 
       startPoint.current = {
         x: e.touches[0].clientX,
@@ -183,7 +200,9 @@ let LibraryController = ({
         setViewBox((prev) => {
           const newWidth = prev.width * zoomFactor;
           const newHeight = prev.height * zoomFactor;
-
+          if (newWidth > maxWidth || newHeight < minWidth) {
+            return prev; // Prevent zooming out too much
+          }
           return {
             width: newWidth,
             height: newHeight,
