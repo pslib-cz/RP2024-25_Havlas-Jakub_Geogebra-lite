@@ -24,6 +24,7 @@ y = ax^n + bx^n(n-1)... + d
 
 
 
-GOT PUBLISHED
+published
+
 @jakub-havlas/graph-lib
 https://github.com/JakubHavlas/graph-lib
