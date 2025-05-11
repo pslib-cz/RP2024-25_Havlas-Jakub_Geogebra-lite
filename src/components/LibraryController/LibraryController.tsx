@@ -60,10 +60,12 @@ let LibraryController = ({
   
     const processedData = ProcessInput(ans.map((item) => item.expression));
     
-    const updatedReqsData = processedData.map((data, index) => ({
-      expression: data.join(" "), // Convert string[] to string
-      color: reqs[index]?.color || "#000",
-    }));
+    const updatedReqsData = processedData
+      ? processedData.map((data, index) => ({
+          expression: data.join(" "), // Convert string[] to string
+          color: reqs[index]?.color || "#000",
+        }))
+      : [];
   
     setReqsData(updatedReqsData);
     

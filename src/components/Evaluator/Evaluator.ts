@@ -1,5 +1,5 @@
 export const evaluator = (expression: string[], x: number) => {
-  
+ 
   //expression = insertImplicitMultiplication(expression);
   expression = expression.map((item) => {
     if (item === "x") return x.toString();
@@ -11,7 +11,7 @@ export const evaluator = (expression: string[], x: number) => {
   });
 
 let foundParen = true;
-
+console.log(expression);
 //ai
 // Could you make the code handle brackets and absolute brackets as well? use recursion for this.
 while (foundParen) {
@@ -102,7 +102,12 @@ while (foundAbs) {
         if (expression[i] === symbol) {
           const left = parseFloat(expression[i - 1]);
           const right = parseFloat(expression[i + 1]);
-  
+          if (isNaN(left) || isNaN(right)) {
+            const result = NaN;
+            expression[i - 1] = result.toString();
+            expression.splice(i, 2); 
+            i = i-2; // Reset index to re-evaluate the expression
+          }
           if (!isNaN(left) && !isNaN(right)) {
             const result = fn(left, right);
             expression[i - 1] = result.toString();
@@ -112,7 +117,7 @@ while (foundAbs) {
         }
       }
     }
-    
+    console.log(expression);
     return expression[0];
   };
 

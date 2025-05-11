@@ -51,8 +51,8 @@ import {ValidFunctions} from "../types";
             curr = "";
         }
     }
-
-    const StinkyDinky = [ "/", "*", "+", "^", "-"  ]
+  
+    const StinkyDinky = [ "/", "*", "+", "^", "-" , "(" ]
     console.log("filteredArr", filteredArr)
     for (let i = filteredArr.length - 1; i >= 0; i--) {
         if ( filteredArr[i] == "-" && (isParsableToNumber(filteredArr[i+1]) || filteredArr[i+1] == "x") && StinkyDinky.includes(filteredArr[i-1]) ) {

@@ -21,7 +21,7 @@ let ProccessInput = (input: string[][]) => {
     for (let i = 0; i < input.length; i++) {
         if (input[i].includes("=")) {
             if (input[i].length !== 3) {
-                throw new Error(`Invalid assignment in input: ${input[i]}`);
+                return ;
             }
             if (!ValidVariables.includes(input[i][0])) {
                 throw new Error(`Invalid variable in assignment: ${input[i]}`);
@@ -45,8 +45,16 @@ let ProccessInput = (input: string[][]) => {
         }
     }
 
- 
+    for (let variable of variables) {
+        for (let i = 0; i < variables.length; i++) {
+           if (variables[i].value === variable.var) {
+            variables[i].value = variable.value;
 
+           }
+        }
+       
+    }
+    console.log(variables);
     for (let variable of variables) {
         for (let i = 0; i < ans.length; i++) {
             ans[i] = ans[i].map((item) => {
